@@ -1,0 +1,54 @@
+package routers
+
+import (
+	"manage/controllers"
+
+	"github.com/astaxie/beego"
+)
+
+func init() {
+	// 首页
+	beego.Router("/", &controllers.IndexController{}, "get:Get")
+	// 用户管理
+	uns := beego.NewNamespace("/users",
+		beego.NSRouter("/", &controllers.UserController{}),
+		beego.NSRouter("/commentstatus", &controllers.UserController{}, "post:ChangeCommentStatus"),
+		beego.NSRouter("/status", &controllers.UserController{}, "post:ChangeStatus"),
+	)
+	// 栏目管理
+	cns := beego.NewNamespace("/categories",
+		beego.NSRouter("/", &controllers.CategoryController{}),
+		beego.NSRouter("/delete", &controllers.CategoryController{}, "post:DeleteCategory"),
+	)
+	// 标签管理
+	tns := beego.NewNamespace("/tags",
+		beego.NSRouter("/", &controllers.TagController{}),
+	)
+	// 文章管理
+	ans := beego.NewNamespace("/articles",
+		beego.NSRouter("/", &controllers.ArticleController{}),
+		beego.NSRouter("/draft", &controllers.ArticleController{}, "get:Draft"),
+	)
+	// 点赞记录
+	fns := beego.NewNamespace("/favors",
+		beego.NSRouter("/", &controllers.FavorRecordController{}),
+	)
+	// 评论管理
+	cns2 := beego.NewNamespace("/comments",
+		beego.NSRouter("/", &controllers.CommentController{}),
+		beego.NSRouter("/keyword", &controllers.CommentController{}, "get:Keyword"),
+	)
+	// 日志管理
+	lns := beego.NewNamespace("/logs",
+		beego.NSRouter("/home", &controllers.LogController{}, "get:HomeLog"),
+		beego.NSRouter("/admin", &controllers.LogController{}, "get:AdminLog"),
+	)
+	// 系统管理
+	sns := beego.NewNamespace("/system",
+		beego.NSRouter("/managers", &controllers.ManagerController{}),
+		beego.NSRouter("/roles", &controllers.RoleController{}),
+		beego.NSRouter("/permissions", &controllers.PermissionController{}),
+	)
+
+	beego.AddNamespace(uns, cns, tns, ans, fns, cns2, lns, sns)
+}

@@ -1,0 +1,94 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content">
+                {{.xsrfdata}}
+                <div class="row">
+                    <div class="col-lg-12 form-horizontal">
+                        <div class="form-group">
+                            <label for="" class="col-lg-1 control-label">评论权限</label>
+                            <div class="col-lg-2">
+                                <select class="form-control" name="" id="comment-status" onchange="search()">
+                                    <option value="-1" {{if eq .commentStatus -1}} selected {{end}}>不限</option>
+                                    <option value="0" {{if eq .commentStatus 0}} selected {{end}}>禁止评论</option>
+                                    <option value="1" {{if eq .commentStatus 1}} selected {{end}}>允许评论</option>
+                                </select>
+                            </div>
+
+                            <label for="" class="col-lg-1 control-label">账号状态</label>
+                            <div class="col-lg-2">
+                                <select class="form-control" name="" id="status" onchange="search()">
+                                    <option value="-1" {{if eq .status -1}} selected {{end}}>不限</option>
+                                    <option value="1" {{if eq .status 1}} selected {{end}}>可用</option>
+                                    <option value="0" {{if eq .status 0}} selected {{end}}>不可用</option>
+                                </select>
+                            </div>
+
+                            <label for="" class="col-lg-1 control-label">关键词</label>
+                            <div class="col-lg-3">
+                                <input type="text" class="form-control" id="keyword" value="{{.keyword}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>用户名</th>
+                            <th>邮箱</th>
+                            <th>评论权限</th>
+                            <th>账号状态</th>
+                            <th>创建时间</th>
+                            <th>更新时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{range $index, $user := .users}}
+                            <tr>
+                                <td>{{getIndex $index 1}}</td>
+                                <td>{{$user.Username}}</td>
+                                <td>{{$user.Email}}</td>
+                                <td>
+                                    {{if $user.AllowComment}}
+                                        <label for="" class="label label-primary">允许</label>
+                                    {{else}}
+                                        <label for="" class="label label-danger">禁止</label>
+                                    {{end}}
+                                </td>
+                                <td>
+                                    {{if $user.Status}}
+                                        <label for="" class="label label-primary">可用</label>
+                                    {{else}}
+                                        <label for="" class="label label-danger">不可用</label>
+                                    {{end}}
+                                </td>
+                                <td>{{dateformat $user.CreatedAt "2006-01-02 15:04:05"}}</td>
+                                <td>{{dateformat $user.UpdatedAt "2006-01-02 15:04:05"}}</td>
+                                <td>
+                                    {{if $user.AllowComment}}
+                                        <button class="btn btn-warning btn-xs" onclick="changeCommentStatus({{$user.Id}}, 0)">禁止评论</button>
+                                    {{else}}
+                                        <button class="btn btn-primary btn-xs" onclick="changeCommentStatus({{$user.Id}}, 1)">允许评论</button>
+                                    {{end}}
+
+                                    {{if $user.Status}}
+                                        <button class="btn btn-danger btn-xs" onclick="changeUserStatus({{$user.Id}}, 0)">禁用账号</button>
+                                    {{else}}
+                                        <button class="btn btn-success btn-xs" onclick="changeUserStatus({{$user.Id}}, 1)">启用账号</button>
+                                    {{end}}
+                                </td>
+                            </tr>
+                        {{end}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

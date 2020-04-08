@@ -1,0 +1,71 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#new-modal"><i class="fa fa-plus"></i> 添加栏目</button>
+            </div>
+            <div class="ibox-content">
+                {{.xsrfdata}}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>名称</th>
+                            <th>简称</th>
+                            <th>文章数量</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{range $index, $cate := .categories}}
+                        <tr>
+                            <td>{{getIndex $index 1}}</td>
+                            <td>{{$cate.Name}}</td>
+                            <td>{{$cate.ShortName}}</td>
+                            <td>{{$cate.ArticleNum}}</td>
+                            <td>{{dateformat $cate.CreatedAt "2006-01-02 15:04:05"}}</td>
+                            <td>
+                                <button class="btn btn-primary btn-xs">编辑</button>
+                                <button class="btn btn-danger btn-xs" onclick="deleteCategory({{$cate.Id}})">删除</button>
+                            </td>
+                        </tr>
+                        {{end}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal inmodal" id="new-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated flipInY">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">添加栏目</h4>
+            </div>
+            <div class="modal-body form-horizontal">
+                <div class="form-group">
+                    <label for="" class="col-lg-2 control-label">名称</label>
+                    <div class="col-lg-9">
+                        <input type="text" class="form-control" id="name">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-lg-2 control-label">简称</label>
+                    <div class="col-lg-9">
+                        <input type="text" class="form-control" id="short-name">
+                    </div>
+                </div>
+                <p class="error text-danger text-center"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="addCategory(this)">确定</button>
+            </div>
+        </div>
+    </div>
+</div>

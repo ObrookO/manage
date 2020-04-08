@@ -1,0 +1,38 @@
+<script>
+    // 添加栏目
+    function addCategory(obj) {
+        let modal = $(obj).parents('.modal'),
+            token = $('input[name=_xsrf]').val(),
+            name = modal.find('#name').val(),
+            short = modal.find('#short-name').val();
+
+        $.post('{{urlfor "admin.CategoryController.Post"}}', {
+            _xsrf: token,
+            name: name,
+            short: short
+        }, function (data) {
+            if (data.code !== 200) {
+                modal.find('.error').text(data.msg)
+            } else {
+                window.location.reload();
+            }
+        }, 'json')
+    }
+
+    // 删除栏目
+    function deleteCategory(id) {
+        if (window.confirm('确定要删除吗？删除后无法恢复！！！')) {
+            let token = $('input[name=_xsrf]').val();
+            $.post('{{urlfor "admin.CategoryController.DeleteCategory"}}', {
+                _xsrf: token,
+                id: id
+            }, function (data) {
+                if (data.code !== 200) {
+                    alert(data.msg);
+                }
+
+                window.location.reload();
+            }, 'json')
+        }
+    }
+</script>
