@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>勤劳的码农 | 登录</title>
+
+    <link rel="icon" type="image/png" href="/static/favicon.png">
+
+    {{assets_css "/css/bootstrap.min.css"}}
+    {{assets_css "/css/font-awesome.css"}}
+    {{assets_css "/css/animate.css"}}
+    {{assets_css "/css/style.css"}}
+
+    <style>
+        #captcha {
+            width: 65%;
+        }
+
+        .captcha {
+            border: 1px solid black;
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            top: -34px;
+            float: right;
+        }
+    </style>
+
+</head>
+<body class="gray-bg">
+<div class="middle-box text-center loginscreen animated fadeInDown">
+    <div>
+        <div>
+            <h1 class="logo-name">MN</h1>
+        </div>
+        <form class="m-t">
+            {{.xsrfdata}}
+            <input type="hidden" name="" id="captcha-id">
+            <div class="form-group">
+                <input type="email" class="form-control" id="username" placeholder="用户名" required="">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" id="password" placeholder="密码" required="">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" id="captcha" placeholder="验证码" required>
+                <img class="captcha" src="" alt="" onclick="getCaptcha()">
+            </div>
+            <button type="button" class="btn btn-primary block full-width m-b">登录</button>
+            <a href="javascript:;"><small>忘记密码？</small></a>
+        </form>
+    </div>
+</div>
+
+{{assets_js "/js/jquery-2.1.1.js"}}
+{{assets_js "/js/bootstrap.min.js"}}
+
+<script>
+    $(function () {
+        getCaptcha();
+    });
+
+    // 获取验证码
+    function getCaptcha() {
+        $.get('/captcha', function (data) {
+            $('#captcha-id').val(data.data.id);
+            if (data.code === 200) {
+                $('.captcha').attr('src', data.data.captcha);
+            } else {
+                $('.captcha').attr('src', '/img/captcha.png');
+            }
+        }, 'json')
+    }
+</script>
+</body>
+</html>

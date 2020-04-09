@@ -9,6 +9,8 @@ import (
 func init() {
 	// 首页
 	beego.Router("/", &controllers.IndexController{}, "get:Get")
+	// 获取验证码
+	beego.Router("/captcha", &controllers.BaseController{}, "get:GetCaptcha")
 	// 用户管理
 	uns := beego.NewNamespace("/accounts",
 		beego.NSRouter("/", &controllers.AccountController{}),
@@ -52,6 +54,10 @@ func init() {
 		beego.NSRouter("/roles", &controllers.RoleController{}),
 		beego.NSRouter("/permissions", &controllers.PermissionController{}),
 	)
+	// 登录、退出等
+	ans2 := beego.NewNamespace("/auth",
+		beego.NSRouter("/login", &controllers.AuthController{}, "get:Login;post:DoLogin"),
+	)
 
-	beego.AddNamespace(uns, cns, tns, ans, fns, cns2, lns, sns)
+	beego.AddNamespace(uns, cns, tns, ans, fns, cns2, lns, sns, ans2)
 }
