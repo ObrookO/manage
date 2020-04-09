@@ -13,14 +13,14 @@
             status = $('#status option:selected').val(),
             keyword = $('#keyword').val();
 
-        window.location.href = '{{urlfor "admin.UserController.Get"}}' + '?cs=' + comment_status + '&s=' + status + '&key=' + keyword;
+        window.location.href = '{{urlfor "AccountController.Get"}}' + '?cs=' + comment_status + '&s=' + status + '&key=' + keyword;
     }
 
     // 修改用户的评论状态
     function changeCommentStatus(id, status) {
         if (window.confirm('确定执行此操作吗？')) {
             let token = $('input[name=_xsrf]').val();
-            $.post('{{urlfor "admin.UserController.ChangeCommentStatus"}}', {
+            $.post('{{urlfor "AccountController.ChangeCommentStatus"}}', {
                 _xsrf: token,
                 id: id,
                 status: status
@@ -38,7 +38,7 @@
     function changeUserStatus(id, status) {
         if (window.confirm('确定执行此操作吗？')) {
             let token = $('input[name=_xsrf]').val();
-            $.post('{{urlfor "admin.UserController.ChangeStatus"}}', {
+            $.post('{{urlfor "AccountController.ChangeStatus"}}', {
                 _xsrf: token,
                 id: id,
                 status: status

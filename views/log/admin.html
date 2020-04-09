@@ -1,0 +1,205 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title"></div>
+            <div class="ibox-content">
+                <div class="row">
+                    <div class="col-lg-12 form-horizontal">
+                        <div class="form-group">
+                            <label for="" class="col-lg-1 control-label">请求方式</label>
+                            <div class="col-lg-2">
+                                <select name="" id="method" class="form-control" onchange="search()">
+                                    <option value="" {{if eq .method ""}} selected {{end}}>不限</option>
+                                    <option value="GET" {{if eq .method "GET"}} selected {{end}}>GET</option>
+                                    <option value="POST" {{if eq .method "POST"}} selected {{end}}>POST</option>
+                                </select>
+                            </div>
+
+                            <label for="" class="col-lg-1 control-label">操作结果</label>
+                            <div class="col-lg-2">
+                                <select name="" id="result" class="form-control" onchange="search()">
+                                    <option value="" {{if eq .result ""}} selected {{end}}>不限</option>
+                                    <option value="SUCCESS" {{if eq .result "SUCCESS"}} selected {{end}}>SUCCESS</option>
+                                    <option value="FAIL" {{if eq .result "FAIL"}} selected {{end}}>FAIL</option>
+                                </select>
+                            </div>
+
+                            <label for="" class="col-lg-1 control-label">关键字</label>
+                            <div class="col-lg-3">
+                                <input type="text" id="keyword" class="form-control" value="{{.keyword}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table admin-log-table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>操作内容</th>
+                            <th>操作结果</th>
+                            <th>客户端IP</th>
+                            <th>请求方式</th>
+                            <th>请求地址</th>
+                            <th>地址栏参数</th>
+                            <th class="headers">请求头</th>
+                            <th class="body">请求体</th>
+                            <th class="response">响应</th>
+                            <th class="reason">失败原因</th>
+                            <th>添加时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{range $index, $log := .logs}}
+                            <tr>
+                                <td>{{add $index 1}}</td>
+                                <td class="content">{{$log.Content}}</td>
+                                <td class="result">
+                                    {{if eq $log.Result "SUCCESS"}}
+                                        <label for="" class="label label-primary">{{$log.Result}}</label>
+                                    {{else}}
+                                        <label for="" class="label label-danger">{{$log.Result}}</label>
+                                    {{end}}
+                                </td>
+                                <td class="ip">{{$log.Ip}}</td>
+                                <td class="method">
+                                    {{if eq $log.Method "GET"}}
+                                        <label for="" class="label label-primary">{{$log.Method}}</label>
+                                    {{else if eq $log.Method "POST"}}
+                                        <label for="" class="label label-warning">{{$log.Method}}</label>
+                                    {{else}}
+                                        <label for="" class="label label-success">{{$log.Method}}</label>
+                                    {{end}}
+                                </td>
+                                <td class="url">{{$log.Url}}</td>
+                                <td class="query">{{$log.Query}}</td>
+                                <td class="headers">{{$log.Headers}}</td>
+                                <td class="body">{{$log.Body}}</td>
+                                <td class="response">{{$log.Response}}</td>
+                                <td class="reason">{{$log.Reason}}</td>
+                                <td class="createdAt">{{dateformat $log.CreatedAt "2006-01-02 15:04:05"}}</td>
+                                <td>
+                                    <button class="btn btn-info btn-xs" onclick="showDetail(this)">查看详情</button>
+                                </td>
+                            </tr>
+                        {{end}}
+                        </tbody>
+                    </table>
+                </div>
+
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li {{if eq .page 1}} class="disabled" {{end}}>
+                            <a href="
+                            {{if le .page 1}}
+                                javascript:;
+                            {{else}}
+                                {{urlfor "LogController.AdminLog"}}?m={{.method}}&r={{.result}}&key={{.keyword}}&p={{sub .page 1}}
+                            {{end}}" aria-label="Previous">
+                                <span aria-hidden="true">上一页</span>
+                            </a>
+                        </li>
+                        <li class="active">
+                            <span>{{.page}}<span class="sr-only">(current)</span></span>
+                        </li>
+                        <li {{if ne .num .limit}} class="disabled" {{end}}>
+                            <a href="
+                            {{if ne .num .limit}}
+                                javascript:;
+                            {{else}}
+                                {{urlfor "LogController.AdminLog"}}?m={{.method}}&r={{.result}}&key={{.keyword}}&p={{add .page 1}}
+                            {{end}}" aria-label="Next">
+                                <span aria-hidden="true">下一页</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{/* 操作详情的模态框 */}}
+<div class="modal inmodal" id="detail-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated flipInY">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">操作详情</h4>
+            </div>
+            <div class="modal-body form-horizontal">
+                <div class="form-group">
+                    <label for="" class="col-lg-3 control-label">操作内容</label>
+                    <div class="col-lg-8">
+                        <p class="content"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-lg-3 control-label">操作结果</label>
+                    <div class="col-lg-8">
+                        <p class="result"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-lg-3 control-label">失败原因</label>
+                    <div class="col-lg-8">
+                        <p class="reason"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-lg-3 control-label">操作时间</label>
+                    <div class="col-lg-8">
+                        <p class="createdAt"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-lg-3 control-label">客户端IP</label>
+                    <div class="col-lg-8">
+                        <p class="ip"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-lg-3 control-label">请求方式</label>
+                    <div class="col-lg-8">
+                        <p class="method"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-lg-3 control-label">请求地址</label>
+                    <div class="col-lg-8">
+                        <p class="url"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-lg-3 control-label">请求参数</label>
+                    <div class="col-lg-8">
+                        <p class="query"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-lg-3 control-label">请求体</label>
+                    <div class="col-lg-8">
+                        <p class="body"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-lg-3 control-label">请求头</label>
+                    <div class="col-lg-8">
+                        <p class="headers"></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-lg-3 control-label">响应内容</label>
+                    <div class="col-lg-8">
+                        <p class="response"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>

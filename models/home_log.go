@@ -26,7 +26,15 @@ func init() {
 	orm.RegisterModel(new(HomeLog))
 }
 
-// 记录日志
-func AddHomeLog(data HomeLog) (int64, error) {
-	return orm.NewOrm().Insert(&data)
+// GetHomeLogs 获取多条日志
+func GetHomeLogs(filter map[string]interface{}, offset, limit int) ([]*HomeLog, error) {
+	var logs []*HomeLog
+
+	needle := orm.NewOrm().QueryTable("home_log")
+	for key, value := range filter {
+		needle = needle.Filter(key, value)
+	}
+
+	_, err := needle.Offset(offset).Limit(limit).OrderBy("-id").All(&logs)
+	return logs, err
 }

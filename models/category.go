@@ -9,9 +9,7 @@ import (
 type Category struct {
 	Id         int
 	Name       string
-	ShortName  string
 	ArticleNum int
-	ManagerId  int
 	CreatedAt  time.Time `orm:"auto_now_add;type(timestamp)"`
 	UpdatedAt  time.Time `orm:"auto_now;type(timestamp)"`
 }
@@ -31,8 +29,8 @@ func IsCategoryExists(filter map[string]interface{}) bool {
 }
 
 // AddCategory 添加栏目
-func AddCategory(data *Category) (int64, error) {
-	return orm.NewOrm().Insert(data)
+func AddCategory(data Category) (int64, error) {
+	return orm.NewOrm().Insert(&data)
 }
 
 // GetCategories 获取所有的栏目
@@ -45,7 +43,6 @@ func GetCategories(filter map[string]interface{}) ([]*Category, error) {
 	}
 
 	_, err := needle.All(&categories)
-
 	return categories, err
 }
 
@@ -59,7 +56,6 @@ func GetCategory(filter map[string]interface{}) (Category, error) {
 	}
 
 	err := needle.One(&category)
-
 	return category, err
 }
 
@@ -71,4 +67,14 @@ func DeleteCategory(filter map[string]interface{}) (int64, error) {
 	}
 
 	return needle.Delete()
+}
+
+// UpdateCategory 更新栏目
+func UpdateCategory(filter, values map[string]interface{}) (int64, error) {
+	needle := orm.NewOrm().QueryTable("admin_category")
+	for key, value := range filter {
+		needle = needle.Filter(key, value)
+	}
+
+	return needle.Update(values)
 }

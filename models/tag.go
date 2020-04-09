@@ -1,7 +1,6 @@
 package models
 
 import (
-	"strings"
 	"time"
 
 	"github.com/astaxie/beego/orm"
@@ -10,7 +9,6 @@ import (
 type Tag struct {
 	Id         int
 	Name       string
-	ManagerId  int
 	ArticleNum int
 	CreatedAt  time.Time `orm:"auto_now_add;type(timestamp)"`
 	UpdatedAt  time.Time `orm:"auto_now;type(timestamp)"`
@@ -20,37 +18,63 @@ func init() {
 	orm.RegisterModelWithPrefix("admin_", new(Tag))
 }
 
-// 获取所有标签
-// where map[string]interface{} 查询条件
-func GetTags(where map[string]interface{}) []Tag {
-	var tags []Tag
+// IsTagExists 判断标签是否存在
+func IsTagExists(filter map[string]interface{}) bool {
 	needle := orm.NewOrm().QueryTable("admin_tag")
-
-	for key, value := range where {
+	for key, value := range filter {
 		needle = needle.Filter(key, value)
 	}
 
-	needle.All(&tags)
-
-	return tags
+	return needle.Exist()
 }
 
-// 获取标签的某一列，返回列表
-// where map[string]interface{} 查询条件
-// col ... string 查询的列
-func GetTagFields(where map[string]interface{}, col ...string) []string {
-	var tags orm.ParamsList
-	var list []string
-	needle := orm.NewOrm().QueryTable("admin_tag")
+// AddTag 添加标签
+func AddTag(data Tag) (int64, error) {
+	return orm.NewOrm().Insert(&data)
+}
 
-	for key, value := range where {
+// GetTags 获取标签
+func GetTags(filter map[string]interface{}) ([]*Tag, error) {
+	var tags []*Tag
+
+	needle := orm.NewOrm().QueryTable("admin_tag")
+	for key, value := range filter {
 		needle = needle.Filter(key, value)
 	}
 
-	needle.ValuesFlat(&tags, strings.Join(col, ","))
-	for _, ele := range tags {
-		list = append(list, ele.(string))
+	_, err := needle.All(&tags)
+	return tags, err
+}
+
+// GetOneTag 获取标签
+func GetOneTag(filter map[string]interface{}) (Tag, error) {
+	var tag Tag
+
+	needle := orm.NewOrm().QueryTable("admin_tag")
+	for key, value := range filter {
+		needle = needle.Filter(key, value)
 	}
 
-	return list
+	err := needle.One(&tag)
+	return tag, err
+}
+
+// UpdateTag 更新标签
+func UpdateTag(filter, values map[string]interface{}) (int64, error) {
+	needle := orm.NewOrm().QueryTable("admin_tag")
+	for key, value := range filter {
+		needle = needle.Filter(key, value)
+	}
+
+	return needle.Update(values)
+}
+
+// DeleteTag 删除标签
+func DeleteTag(filter map[string]interface{}) (int64, error) {
+	needle := orm.NewOrm().QueryTable("admin_tag")
+	for key, value := range filter {
+		needle = needle.Filter(key, value)
+	}
+
+	return needle.Delete()
 }

@@ -1,11 +1,10 @@
 <script>
-    // 添加栏目
-    function addCategory(obj) {
+    function addTag(obj) {
         let modal = $(obj).parents('.modal'),
             token = $('input[name=_xsrf]').val(),
             name = modal.find('#name').val();
 
-        $.post('{{urlfor "CategoryController.Post"}}', {
+        $.post('{{urlfor "TagController.Post"}}', {
             _xsrf: token,
             name: name,
         }, function (data) {
@@ -20,7 +19,7 @@
     // 显示编辑的模态框
     function showEditModal(obj, id) {
         let tr = $(obj).parents('tr'),
-            name = tr.find('.cate-name').text(),
+            name = tr.find('.tag-name').text(),
             modal = $('#edit-modal');
 
         modal.find('#id').val(id);
@@ -28,15 +27,14 @@
         modal.modal();
     }
 
-
-    // 编辑栏目
-    function editCategory(obj) {
+    // 编辑标签
+    function editTag(obj) {
         let modal = $(obj).parents('.modal'),
             token = $('input[name=_xsrf]').val(),
             id = modal.find('#id').val(),
             name = modal.find('#name').val();
 
-        $.post('{{urlfor "CategoryController.UpdateCategory"}}', {
+        $.post('{{urlfor "TagController.UpdateTag"}}', {
             _xsrf: token,
             id: id,
             name: name,
@@ -49,12 +47,11 @@
         }, 'json')
     }
 
-
-    // 删除栏目
-    function deleteCategory(id) {
+    // 删除标签
+    function deleteTag(id) {
         if (window.confirm('确定要删除吗？删除后无法恢复！！！')) {
             let token = $('input[name=_xsrf]').val();
-            $.post('{{urlfor "CategoryController.DeleteCategory"}}', {
+            $.post('{{urlfor "TagController.DeleteTag"}}', {
                 _xsrf: token,
                 id: id
             }, function (data) {
@@ -67,3 +64,4 @@
         }
     }
 </script>
+

@@ -49,38 +49,38 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {{range $index, $user := .users}}
+                        {{range $index, $account := .accounts}}
                             <tr>
-                                <td>{{getIndex $index 1}}</td>
-                                <td>{{$user.Username}}</td>
-                                <td>{{$user.Email}}</td>
+                                <td>{{add $index 1}}</td>
+                                <td>{{$account.Username}}</td>
+                                <td>{{$account.Email}}</td>
                                 <td>
-                                    {{if $user.AllowComment}}
+                                    {{if $account.AllowComment}}
                                         <label for="" class="label label-primary">允许</label>
                                     {{else}}
                                         <label for="" class="label label-danger">禁止</label>
                                     {{end}}
                                 </td>
                                 <td>
-                                    {{if $user.Status}}
+                                    {{if $account.Status}}
                                         <label for="" class="label label-primary">可用</label>
                                     {{else}}
                                         <label for="" class="label label-danger">不可用</label>
                                     {{end}}
                                 </td>
-                                <td>{{dateformat $user.CreatedAt "2006-01-02 15:04:05"}}</td>
-                                <td>{{dateformat $user.UpdatedAt "2006-01-02 15:04:05"}}</td>
+                                <td>{{dateformat $account.CreatedAt "2006-01-02 15:04:05"}}</td>
+                                <td>{{dateformat $account.UpdatedAt "2006-01-02 15:04:05"}}</td>
                                 <td>
-                                    {{if $user.AllowComment}}
-                                        <button class="btn btn-warning btn-xs" onclick="changeCommentStatus({{$user.Id}}, 0)">禁止评论</button>
+                                    {{if $account.AllowComment}}
+                                        <button class="btn btn-warning btn-xs" onclick="changeCommentStatus({{$account.Id}}, 0)">禁止评论</button>
                                     {{else}}
-                                        <button class="btn btn-primary btn-xs" onclick="changeCommentStatus({{$user.Id}}, 1)">允许评论</button>
+                                        <button class="btn btn-primary btn-xs" onclick="changeCommentStatus({{$account.Id}}, 1)">允许评论</button>
                                     {{end}}
 
-                                    {{if $user.Status}}
-                                        <button class="btn btn-danger btn-xs" onclick="changeUserStatus({{$user.Id}}, 0)">禁用账号</button>
+                                    {{if $account.Status}}
+                                        <button class="btn btn-danger btn-xs" onclick="changeUserStatus({{$account.Id}}, 0)">禁用账号</button>
                                     {{else}}
-                                        <button class="btn btn-success btn-xs" onclick="changeUserStatus({{$user.Id}}, 1)">启用账号</button>
+                                        <button class="btn btn-success btn-xs" onclick="changeUserStatus({{$account.Id}}, 1)">启用账号</button>
                                     {{end}}
                                 </td>
                             </tr>

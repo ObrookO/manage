@@ -1,0 +1,38 @@
+<script>
+    $(function () {
+        $('#keyword').on('keyup', function (e) {
+            if (e.keyCode === 13) {
+                search();
+            }
+        })
+    });
+
+    // 搜索功能
+    function search() {
+        let method = $('#method option:selected').val(),
+            result = $('#result option:selected').val(),
+            keyword = $('#keyword').val();
+
+        window.location.href = '{{urlfor "LogController.Get"}}' + '?m=' + method + '&r=' + result + '&key=' + keyword;
+    }
+
+    // 显示详情
+    function showDetail(obj) {
+        let modal = $('#detail-modal'),
+            tr = $(obj).parents('tr');
+
+        modal.find('.content').html(tr.find('.content').html());
+        modal.find('.ip').html(tr.find('.ip').html());
+        modal.find('.url').html(tr.find('.url').html());
+        modal.find('.method').html(tr.find('.method').html());
+        modal.find('.query').html(tr.find('.query').html());
+        modal.find('.headers').html(tr.find('.headers').html());
+        modal.find('.body').html(tr.find('.body').html());
+        modal.find('.response').html(tr.find('.response').html());
+        modal.find('.result').html(tr.find('.result').html());
+        modal.find('.reason').html(tr.find('.reason').html());
+        modal.find('.createdAt').html(tr.find('.createdAt').html());
+        modal.modal();
+    }
+
+</script>

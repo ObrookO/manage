@@ -23,19 +23,29 @@ func init() {
 }
 
 func main() {
-	beego.SetStaticPath("/acss", "static/css")
-	beego.SetStaticPath("/aimg", "static/img")
-	beego.SetStaticPath("/ajs", "static/js")
-	beego.SetStaticPath("/ai", "static/i")
-	beego.SetStaticPath("/afonts", "static/fonts")
+	if beego.BConfig.RunMode == "dev" {
+		//orm.Debug = true
+	}
+
+	beego.SetStaticPath("/css", "static/css")
+	beego.SetStaticPath("/img", "static/img")
+	beego.SetStaticPath("/js", "static/js")
+	beego.SetStaticPath("/i", "static/i")
+	beego.SetStaticPath("/fonts", "static/fonts")
 
 	// 注册自定义函数
-	beego.AddFuncMap("getIndex", getIndex)
+	beego.AddFuncMap("add", add)
+	beego.AddFuncMap("sub", sub)
 
 	beego.Run()
 }
 
-// 获取索引
-func getIndex(i, step int) int {
+//  加法计算
+func add(i, step int) int {
 	return i + step
+}
+
+// 减法计算
+func sub(i, step int) int {
+	return i - step
 }

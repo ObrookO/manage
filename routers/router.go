@@ -10,19 +10,22 @@ func init() {
 	// 首页
 	beego.Router("/", &controllers.IndexController{}, "get:Get")
 	// 用户管理
-	uns := beego.NewNamespace("/users",
-		beego.NSRouter("/", &controllers.UserController{}),
-		beego.NSRouter("/commentstatus", &controllers.UserController{}, "post:ChangeCommentStatus"),
-		beego.NSRouter("/status", &controllers.UserController{}, "post:ChangeStatus"),
+	uns := beego.NewNamespace("/accounts",
+		beego.NSRouter("/", &controllers.AccountController{}),
+		beego.NSRouter("/commentstatus", &controllers.AccountController{}, "post:ChangeCommentStatus"),
+		beego.NSRouter("/status", &controllers.AccountController{}, "post:ChangeStatus"),
 	)
 	// 栏目管理
 	cns := beego.NewNamespace("/categories",
 		beego.NSRouter("/", &controllers.CategoryController{}),
 		beego.NSRouter("/delete", &controllers.CategoryController{}, "post:DeleteCategory"),
+		beego.NSRouter("/update", &controllers.CategoryController{}, "post:UpdateCategory"),
 	)
 	// 标签管理
 	tns := beego.NewNamespace("/tags",
 		beego.NSRouter("/", &controllers.TagController{}),
+		beego.NSRouter("/delete", &controllers.TagController{}, "post:DeleteTag"),
+		beego.NSRouter("/update", &controllers.TagController{}, "post:UpdateTag"),
 	)
 	// 文章管理
 	ans := beego.NewNamespace("/articles",
