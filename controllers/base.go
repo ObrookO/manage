@@ -5,8 +5,6 @@ import (
 	"manage/models"
 	"manage/utils"
 
-	"github.com/mojocn/base64Captcha"
-
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 )
@@ -25,9 +23,7 @@ type BaseController struct {
 func (c *BaseController) GetCaptcha() {
 	c.EnableRender = false
 
-	captcha := base64Captcha.NewCaptcha(base64Captcha.DefaultDriverDigit, base64Captcha.DefaultMemStore)
-	id, bs64, err := captcha.Generate()
-
+	id, bs64, err := utils.GetCaptcha()
 	if err != nil {
 		AddLog(c.Ctx, "生成验证码", err.Error(), "{\"code\": 400000, \"msg\": \"获取验证码失败\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "获取验证码失败", Data: map[string]string{"id": utils.RandomStr(20), "captcha": ""}}
