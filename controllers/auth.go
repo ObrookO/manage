@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"html/template"
 	"manage/models"
-	"manage/utils"
+
+	utils "github.com/ObrookO/go-utils"
 
 	"github.com/astaxie/beego"
 
@@ -93,9 +94,10 @@ func (c *AuthController) DoLogin() {
 
 	// 校验用户名密码
 	aesKey := beego.AppConfig.String("aes_key")
+	encryptPass, _ := utils.AesEncrypt(password, aesKey)
 	filter := map[string]interface{}{
 		"username": username,
-		"password": utils.AesEncrypt(password, aesKey),
+		"password": encryptPass,
 	}
 
 	manager, _ := models.GetOneManager(filter)

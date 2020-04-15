@@ -3,9 +3,10 @@ package controllers
 import (
 	"html/template"
 	"manage/models"
-	"manage/utils"
 	"strings"
 	"time"
+
+	utils "github.com/ObrookO/go-utils"
 )
 
 type AccountController struct {

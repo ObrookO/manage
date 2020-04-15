@@ -2,7 +2,8 @@ package initialization
 
 import (
 	"manage/models"
-	"manage/utils"
+
+	utils "github.com/ObrookO/go-utils"
 
 	"github.com/astaxie/beego"
 
@@ -20,10 +21,11 @@ func InitializeManager() {
 	if !models.IsManagerExists(nil) {
 		key := beego.AppConfig.String("aes_key")
 
+		encryptPass, _ := utils.AesEncrypt(ManagerPassword, key)
 		if _, err := models.AddManager(models.Manager{
 			Username: ManagerName,
 			Nickname: ManagerNickname,
-			Password: utils.AesEncrypt(ManagerPassword, key),
+			Password: encryptPass,
 		}); err != nil {
 			logs.Error("Initialize Manager Failed: %v", err)
 		}
