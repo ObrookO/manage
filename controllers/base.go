@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"manage/models"
-	"manage/utils"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
@@ -19,21 +18,22 @@ type BaseController struct {
 	beego.Controller
 }
 
-// 获取验证码
-func (c *BaseController) GetCaptcha() {
-	c.EnableRender = false
+var (
+	ManagerInfo map[string]interface{} // 管理员信息
+)
 
-	id, bs64, err := utils.GetCaptcha()
-	if err != nil {
-		AddLog(c.Ctx, "生成验证码", err.Error(), "{\"code\": 400000, \"msg\": \"获取验证码失败\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "获取验证码失败", Data: map[string]string{"id": utils.RandomStr(20), "captcha": ""}}
-		c.ServeJSON()
-		return
+func (c *BaseController) Prepare() {
+	l := c.GetSession("isLogin")
+	m := c.GetSession("manager")
+
+	if l != nil && m != nil {
+		ManagerInfo = m.(map[string]interface{})
+		c.Data = map[interface{}]interface{}{
+			"username": ManagerInfo["username"],
+		}
+	} else {
+		c.Redirect(c.URLFor("AuthController.Login"), 302)
 	}
-
-	AddLog(c.Ctx, "生成验证码", "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
-	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK", Data: map[string]string{"id": id, "captcha": bs64}}
-	c.ServeJSON()
 }
 
 // 记录日志

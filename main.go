@@ -1,6 +1,7 @@
 package main
 
 import (
+	"manage/initialization"
 	_ "manage/routers"
 
 	"github.com/astaxie/beego/orm"
@@ -27,6 +28,7 @@ func main() {
 		//orm.Debug = true
 	}
 
+	// 设置资源路径
 	beego.SetStaticPath("/css", "static/css")
 	beego.SetStaticPath("/img", "static/img")
 	beego.SetStaticPath("/js", "static/js")
@@ -36,6 +38,9 @@ func main() {
 	// 注册自定义函数
 	beego.AddFuncMap("add", add)
 	beego.AddFuncMap("sub", sub)
+
+	// 初始化
+	initialization.InitializeManager()
 
 	beego.Run()
 }
