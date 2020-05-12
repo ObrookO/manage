@@ -34,6 +34,7 @@ func main() {
 	beego.SetStaticPath("/js", "static/js")
 	beego.SetStaticPath("/i", "static/i")
 	beego.SetStaticPath("/fonts", "static/fonts")
+	beego.SetStaticPath("/uploads", "static/upload")
 
 	// 注册自定义函数
 	beego.AddFuncMap("add", add)

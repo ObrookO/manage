@@ -30,7 +30,9 @@ func init() {
 	)
 	// 文章管理
 	ans := beego.NewNamespace("/articles",
-		beego.NSRouter("/", &controllers.ArticleController{}),
+		beego.NSRouter("/", &controllers.ArticleController{}, "get:Get"),
+		beego.NSRouter("/uploadCover", &controllers.ArticleController{}, "post:UploadCover"),
+		beego.NSRouter("/create", &controllers.ArticleController{}, "get:AddArticle;post:Post"),
 		beego.NSRouter("/draft", &controllers.ArticleController{}, "get:Draft"),
 	)
 	// 点赞记录

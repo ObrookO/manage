@@ -5,3 +5,7 @@ manage
 go.sum
 *.log
 *.exe
+static/upload/*.jpeg
+static/upload/*.jpg
+static/upload/*.png
+static/upload/*.gif

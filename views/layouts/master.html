@@ -14,6 +14,13 @@
     {{assets_css "/css/animate.css"}}
     {{assets_css "/css/style.css"}}
 
+    <style>
+        .require_label:before {
+            content: '* ';
+            color: red;
+        }
+    </style>
+
     {{.Style}}
 
 </head>
@@ -51,8 +58,8 @@
     });
 
     // 左侧菜单高亮
-    function highlightMenu() {
-        let path = window.location.pathname,
+    function highlightMenu(url = '') {
+        let path = url ? url : window.location.pathname,
             link = $('#side-menu').find('a[href="' + path + '"]');
 
         if (link.parents('li').has('ul').length > 0) {

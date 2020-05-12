@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-const PageLimit = 20
+const LogPageLimit = 20
 
 type LogController struct {
 	BaseController
@@ -23,7 +23,7 @@ func (c *LogController) HomeLog() {
 	AddLog(c.Ctx, "查看前台日志列表", "", "PAGE", "SUCCESS")
 
 	filter := map[string]interface{}{}
-	logs, _ := models.GetHomeLogs(filter, 0, PageLimit)
+	logs, _ := models.GetHomeLogs(filter, 0, LogPageLimit)
 
 	c.Data = map[interface{}]interface{}{
 		"logs": logs,
@@ -46,7 +46,7 @@ func (c *LogController) AdminLog() {
 
 	page, _ := c.GetInt("p")
 	if page > 0 {
-		offset = (page - 1) * PageLimit
+		offset = (page - 1) * LogPageLimit
 	} else {
 		page = 1
 	}
@@ -73,7 +73,7 @@ func (c *LogController) AdminLog() {
 		}
 	}
 
-	logs, _ := models.GetAdminLogs(filter, offset, PageLimit)
+	logs, _ := models.GetAdminLogs(filter, offset, LogPageLimit)
 
 	c.Data = map[interface{}]interface{}{
 		"page":    page,
@@ -82,6 +82,6 @@ func (c *LogController) AdminLog() {
 		"keyword": keyword,
 		"logs":    logs,
 		"num":     len(logs),
-		"limit":   PageLimit,
+		"limit":   LogPageLimit,
 	}
 }

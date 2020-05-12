@@ -1,0 +1,84 @@
+{{assets_js "/js/wangEditor.min.js"}}
+<script>
+    $(function () {
+        // 高亮菜单
+        highlightMenu('/articles');
+
+        $('.upload_button').on('click', function () {
+            $('input.cover').click();
+        });
+
+        let E = window.wangEditor,
+            editor = new E('#editor');
+
+        editor.customConfig.menus = [
+            'head',  // 标题
+            'bold',  // 粗体
+            'fontSize',  // 字号
+            'fontName',  // 字体
+            'italic',  // 斜体
+            'underline',  // 下划线
+            'strikeThrough',  // 删除线
+            'foreColor',  // 文字颜色
+            'backColor',  // 背景颜色
+            'link',  // 插入链接
+            'list',  // 列表
+            'justify',  // 对齐方式
+            'quote',  // 引用
+            'image',  // 插入图片
+            'table',  // 表格
+            'code',  // 插入代码
+            'undo',  // 撤销
+            'redo'  // 重复
+        ];
+        editor.customConfig.showLinkImg = false;
+        editor.customConfig.uploadImgShowBase64 = true;
+        editor.create();
+    });
+
+    /**
+     * 上传封面图
+     * @param obj
+     */
+    function showImgPreview(obj) {
+        let files = $(obj)[0].files;
+
+        if (files.length > 0) {
+            let file = files[0],
+                token = $('input[name=_xsrf]').val(),
+                fd = new FormData();
+
+            fd.append("_xsrf", token);
+            fd.append('cover', file);
+
+            $.ajax({
+                url: '{{urlfor "ArticleController.UploadCover"}}',
+                type: 'post',
+                dataType: 'json',
+                data: fd,
+                success: function (data) {
+                    if (data.code !== 200) {
+                        alert(data.msg);
+                    } else {
+                        $('input[name=cover]').val(data.data);
+                        $('.cover_preview').attr('src', '/uploads/' + data.data);
+                        $('.cover_preview_div').show();
+                    }
+                },
+                error: function () {
+                    alert('系统错误，请联系管理员');
+                },
+                processData: false,
+                contentType: false
+            })
+
+        }
+    }
+
+
+    function addArticle(obj) {
+        // let form = $(obj).parents('.article_form');
+        //
+        // console.log(form)
+    }
+</script>
