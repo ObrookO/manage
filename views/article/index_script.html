@@ -1,0 +1,15 @@
+<script>
+    /**
+     * 查询文章
+     */
+    function searchArticle() {
+        let category = $('#category').val(),
+            isScroll = $('#isScroll').val(),
+            allowComment = $('#allowComment').val(),
+            isRecommend = $('#isRecommend').val(),
+            keyword = $('#keyword').val();
+
+        window.location.href = '{{urlfor "ArticleController.Get"}}' + '?c=' + category + '&s=' + isScroll + '&ac=' + allowComment + '&r=' +
+            isRecommend + '&k=' + keyword;
+    }
+</script>

@@ -10,7 +10,7 @@ type TagController struct {
 	BaseController
 }
 
-const TagNameMaxLength = 10
+var tagNameMaxLength = 10
 
 // Get 查看标签列表
 func (c *TagController) Get() {
@@ -36,7 +36,7 @@ func (c *TagController) Post() {
 	c.EnableRender = false
 
 	name := c.GetString("name")
-	if len(name) == 0 || len([]rune(name)) > TagNameMaxLength {
+	if len(name) == 0 || len([]rune(name)) > tagNameMaxLength {
 		AddLog(c.Ctx, "添加标签 "+name, "名称的长度为0-10", "{\"code\": 400000, \"msg\": \"名称的长度为0-10\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "名称的长度为0-10"}
 		c.ServeJSON()
@@ -109,7 +109,7 @@ func (c *TagController) UpdateTag() {
 		return
 	}
 
-	if len(name) == 0 || len([]rune(name)) > TagNameMaxLength {
+	if len(name) == 0 || len([]rune(name)) > tagNameMaxLength {
 		AddLog(c.Ctx, "修改标签 "+tag.Name+" 的名称为 "+name, "名称的长度为0-10", "{\"code\": 400000, \"msg\": \"名称的长度为0-10\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "名称的长度为0-10"}
 		c.ServeJSON()

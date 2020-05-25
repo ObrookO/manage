@@ -1,5 +1,26 @@
 {{assets_js "/js/wangEditor.min.js"}}
 <script>
+    let E = window.wangEditor,
+        filename = 'file',
+        editor = new E('#editor'),
+        token = $('input[name=_xsrf]').val();
+
+    // 定义图片上传路径
+    editor.customConfig.uploadImgServer = '{{urlfor "ArticleController.UploadImage"}}';
+    // 定义图片上传名称
+    editor.customConfig.uploadFileName = filename;
+    // 定义图片上传参数
+    editor.customConfig.uploadImgParams = {
+        _xsrf: token,
+        type: 'content'
+    };
+    // 定义图片上传之后的插入功能
+    editor.customConfig.uploadImgHooks = {
+        customInsert: function (insertImg, result, editor) {
+            insertImg('/uploads/' + result.data);
+        }
+    };
+
     $(function () {
         // 高亮菜单
         highlightMenu('/articles');
@@ -7,9 +28,6 @@
         $('.upload_button').on('click', function () {
             $('input.cover').click();
         });
-
-        let E = window.wangEditor,
-            editor = new E('#editor');
 
         editor.customConfig.menus = [
             'head',  // 标题
@@ -45,14 +63,14 @@
 
         if (files.length > 0) {
             let file = files[0],
-                token = $('input[name=_xsrf]').val(),
                 fd = new FormData();
 
             fd.append("_xsrf", token);
-            fd.append('cover', file);
+            fd.append(filename, file);
+            fd.append('type', 'cover');
 
             $.ajax({
-                url: '{{urlfor "ArticleController.UploadCover"}}',
+                url: '{{urlfor "ArticleController.UploadImage"}}',
                 type: 'post',
                 dataType: 'json',
                 data: fd,
@@ -60,7 +78,7 @@
                     if (data.code !== 200) {
                         alert(data.msg);
                     } else {
-                        $('input[name=cover]').val(data.data);
+                        $('#cover').val(data.data);
                         $('.cover_preview').attr('src', '/uploads/' + data.data);
                         $('.cover_preview_div').show();
                     }
@@ -71,14 +89,57 @@
                 processData: false,
                 contentType: false
             })
-
         }
     }
 
+    /**
+     * 添加文章
+     * @param obj
+     */
+    function addArticle(obj, is_draft) {
+        let form = $(obj).parents('.article_form'),
+            title = form.find('#title').val(),
+            categoryId = form.find('#category_id option:selected').val(),
+            checkedTag = form.find('[name=tags]:checked'),
+            tags = [],
+            description = form.find('#description').val(),
+            cover = form.find('#cover').val(),
+            content = $.trim(editor.txt.html()),
+            isScroll = form.find('[name=is_scroll]:checked').val(),
+            isRecommend = form.find('[name=is_recommend]:checked').val(),
+            allowComment = form.find('[name=allow_comment]:checked').val();
 
-    function addArticle(obj) {
-        // let form = $(obj).parents('.article_form');
-        //
-        // console.log(form)
+        checkedTag.each(function () {
+            tags.push($(this).val())
+        });
+
+        $.ajax({
+            url: form.attr('action'),
+            type: 'post',
+            dataType: 'json',
+            data: {
+                _xsrf: token,
+                title: title,
+                categoryId: categoryId,
+                tags: tags.join(','),
+                description: description,
+                cover: cover,
+                content: content,
+                isScroll: isScroll,
+                isRecommend: isRecommend,
+                allowComment: allowComment,
+                isDraft: is_draft,
+            },
+            success: function (data) {
+                if (data.code !== 200) {
+                    form.find('.error').text(data.msg);
+                } else {
+                    window.location.href = '{{urlfor "ArticleController.Get"}}';
+                }
+            },
+            error: function () {
+                form.find('.error').text('系统错误，请联系管理员');
+            }
+        })
     }
 </script>

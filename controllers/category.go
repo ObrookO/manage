@@ -10,7 +10,7 @@ type CategoryController struct {
 	BaseController
 }
 
-const CategoryNameMaxLength = 10
+var categoryNameMaxLength = 10
 
 func (c *CategoryController) Get() {
 	c.Layout = "layouts/master.html"
@@ -35,7 +35,7 @@ func (c *CategoryController) Post() {
 	c.EnableRender = false
 
 	name := c.GetString("name")
-	if len(name) == 0 || len([]rune(name)) > CategoryNameMaxLength {
+	if len(name) == 0 || len([]rune(name)) > categoryNameMaxLength {
 		AddLog(c.Ctx, "添加栏目 "+name, "名称的长度为0-10", "{\"code\": 400000, \"msg\": \"名称的长度为0-10\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "名称的长度为0-10"}
 		c.ServeJSON()
@@ -108,7 +108,7 @@ func (c *CategoryController) UpdateCategory() {
 		return
 	}
 
-	if len(name) == 0 || len([]rune(name)) > CategoryNameMaxLength {
+	if len(name) == 0 || len([]rune(name)) > categoryNameMaxLength {
 		AddLog(c.Ctx, "修改栏目 "+category.Name+" 的名称为 "+name, "名称的长度为0-10", "{\"code\": 400000, \"msg\": \"名称的长度为0-10\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "名称的长度为0-10"}
 		c.ServeJSON()

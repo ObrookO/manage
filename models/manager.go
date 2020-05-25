@@ -1,29 +1,8 @@
 package models
 
-import (
-	"time"
-
-	"github.com/astaxie/beego/orm"
-)
-
-type Manager struct {
-	Id        int
-	Username  string
-	Nickname  string
-	Email     string
-	Password  string
-	Avatar    string
-	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)"`
-	UpdatedAt time.Time `orm:"auto_now;type(timestamp)"`
-}
-
-func init() {
-	orm.RegisterModelWithPrefix("admin_", new(Manager))
-}
-
 // IsManagerExists 判断管理员是否存在
 func IsManagerExists(filter map[string]interface{}) bool {
-	needle := orm.NewOrm().QueryTable("admin_manager")
+	needle := o.QueryTable("manager")
 	for key, value := range filter {
 		needle = needle.Filter(key, value)
 	}
@@ -35,7 +14,7 @@ func IsManagerExists(filter map[string]interface{}) bool {
 func GetOneManager(filter map[string]interface{}) (Manager, error) {
 	var manager Manager
 
-	needle := orm.NewOrm().QueryTable("admin_manager")
+	needle := o.QueryTable("manager")
 	for key, value := range filter {
 		needle = needle.Filter(key, value)
 	}
@@ -46,5 +25,5 @@ func GetOneManager(filter map[string]interface{}) (Manager, error) {
 
 // AddManager 添加管理员
 func AddManager(manager Manager) (int64, error) {
-	return orm.NewOrm().Insert(&manager)
+	return o.Insert(&manager)
 }

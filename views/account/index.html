@@ -75,7 +75,7 @@
                                 <td>{{dateformat $account.UpdatedAt "2006-01-02 15:04:05"}}</td>
                                 <td>
                                     {{if $account.AllowComment}}
-                                        <button class="btn btn-warning btn-xs" onclick="changeCommentStatus({{$account.Id}}, 0)">禁止评论</button>
+                                        <button class="btn btn-warning btn-xs btn-outline" onclick="changeCommentStatus({{$account.Id}}, 0)">禁止评论</button>
                                     {{else}}
                                         <button class="btn btn-primary btn-xs" onclick="changeCommentStatus({{$account.Id}}, 1)">允许评论</button>
                                     {{end}}

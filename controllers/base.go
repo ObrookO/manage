@@ -8,14 +8,14 @@ import (
 	"github.com/astaxie/beego/context"
 )
 
+type BaseController struct {
+	beego.Controller
+}
+
 type JSONResponse struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`
 	Data interface{} `json:"data"`
-}
-
-type BaseController struct {
-	beego.Controller
 }
 
 var (
