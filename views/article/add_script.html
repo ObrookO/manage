@@ -99,7 +99,7 @@
     function addArticle(obj, is_draft) {
         let form = $(obj).parents('.article_form'),
             title = form.find('#title').val(),
-            categoryId = form.find('#category_id option:selected').val(),
+            categoryId = form.find('[name=category]:checked').val(),
             checkedTag = form.find('[name=tags]:checked'),
             tags = [],
             description = form.find('#description').val(),
@@ -141,5 +141,85 @@
                 form.find('.error').text('系统错误，请联系管理员');
             }
         })
+    }
+
+    /**
+     * 显示添加栏目的input
+     * @param obj
+     */
+    function showAddCategoryLabel(obj) {
+        let container = $('.category-container'),
+            label = '<label class="radio-inline"><input type="radio" name="category" class="category-radio"><input type="text" ' +
+                'class="category-name" ' +
+                'onblur="addCategory(this)"> <span class="notice text-danger"></span></label>';
+
+        container.append(label);
+        container.find('.category-name').focus();
+    }
+
+    /**
+     * 添加栏目
+     * @param obj
+     */
+    function addCategory(obj) {
+        let token = $('input[name=_xsrf]').val(),
+            name = $(obj).val();
+
+        if (name.length > 0) {
+            $.post('{{urlfor "CategoryController.Post"}}', {
+                _xsrf: token,
+                name: name,
+            }, function (data) {
+                if (data.code === 200) {
+                    $(obj).prev('.category-radio').attr({'checked': true, 'value': data.data});
+                    $(obj).replaceWith(name);
+                } else {
+                    $(obj).next('.notice').text(data.msg);
+                    $(obj).focus();
+                }
+            }, 'json')
+        } else {
+            $(obj).parent('.radio-inline').remove();
+        }
+    }
+
+    /**
+     * 显示添加标签的label
+     */
+    function showAddTagLabel() {
+        let container = $('.tag-container'),
+            label = '<label for="" class="checkbox-inline"><input type="checkbox" name="tags" class="tag-checkbox"><input type="text" ' +
+                'class="tag-name" ' +
+                'onblur="addTag(this)' +
+                '"> <span class="notice text-danger"></span></label>';
+
+        container.append(label);
+        container.find('.tag-name').focus();
+    }
+
+    /**
+     * 添加标签
+     * @param obj
+     */
+    function addTag(obj) {
+        let token = $('input[name=_xsrf]').val(),
+            name = $(obj).val();
+
+        if (name.length > 0) {
+            $.post('{{urlfor "TagController.Post"}}', {
+                _xsrf: token,
+                name: name,
+            }, function (data) {
+                if (data.code === 200) {
+                    $(obj).prev('.tag-checkbox').attr({'checked': true, 'value': data.data});
+                    $(obj).replaceWith(name);
+                } else {
+                    $(obj).next('.notice').text(data.msg);
+                    $(obj).focus();
+                }
+            }, 'json')
+        } else {
+            $(obj).parent('.checkbox-inline').remove();
+        }
     }
 </script>

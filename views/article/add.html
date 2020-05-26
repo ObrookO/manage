@@ -16,18 +16,30 @@
                     </div>
                     <div class="form-group">
                         <label for="" class="col-lg-2 control-label require_label">栏目</label>
-                        <div class="col-lg-8">
-                            <select id="category_id" class="form-control">
-                                <option value="0">请选择栏目</option>
-                                {{range $cate := .categories}}
-                                    <option value="{{$cate.Id}}">{{$cate.Name}}</option>
-                                {{end}}
-                            </select>
+                        <div class="col-lg-2">
+                            <button type="button" class="btn btn-success btn-sm" onclick="showAddCategoryLabel(this)"><i class="fa
+                            fa-plus"></i>添加栏目</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-lg-2 control-label"></label>
+                        <div class="col-lg-5 category-container">
+                            {{range $cate := .categories}}
+                                <label for="" class="radio-inline">
+                                    <input type="radio" value="{{$cate.Id}}" name="category"> {{$cate.Name}}
+                                </label>
+                            {{end}}
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="" class="col-lg-2 control-label require_label">标签</label>
-                        <div class="col-lg-8">
+                        <div class="col-lg-1">
+                            <button type="button" class="btn btn-success btn-sm" onclick="showAddTagLabel()"><i class="fa fa-plus"></i> 添加标签</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-lg-2 control-label"></label>
+                        <div class="col-lg-8 tag-container">
                             {{range $tag := .tags}}
                                 <label for="" class="checkbox-inline">
                                     <input type="checkbox" value="{{$tag.Id}}" name="tags"> {{$tag.Name}}
@@ -44,7 +56,7 @@
                     <div class="form-group">
                         <label for="" class="col-lg-2 control-label require_label">封面</label>
                         <div class="col-lg-8">
-                            <button type="button" class="btn btn-success upload_button"><i class="fa fa-upload"></i> 选择文件</button>
+                            <button type="button" class="btn btn-success btn-sm upload_button"><i class="fa fa-upload"></i> 选择文件</button>
                             <input type="file" class="cover" onchange="showImgPreview(this)" accept="image/jpeg,image/png,image/gif">
                         </div>
                     </div>

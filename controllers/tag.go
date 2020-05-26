@@ -50,7 +50,8 @@ func (c *TagController) Post() {
 		return
 	}
 
-	if _, err := models.AddTag(models.Tag{Name: name}); err != nil {
+	tagId, err := models.AddTag(models.Tag{Name: name})
+	if err != nil {
 		AddLog(c.Ctx, "添加标签 "+name, err.Error(), "{\"code\": 400002, \"msg\": \"标签添加失败\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "标签添加失败"}
 		c.ServeJSON()
@@ -58,7 +59,7 @@ func (c *TagController) Post() {
 	}
 
 	AddLog(c.Ctx, "添加标签 "+name, "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
-	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
+	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK", Data: tagId}
 	c.ServeJSON()
 }
 

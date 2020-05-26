@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"html/template"
 	"manage/models"
 	"time"
@@ -49,15 +50,16 @@ func (c *CategoryController) Post() {
 		return
 	}
 
-	if _, err := models.AddCategory(models.Category{Name: name}); err != nil {
+	categoryId, err := models.AddCategory(models.Category{Name: name})
+	if err != nil {
 		AddLog(c.Ctx, "添加栏目 "+name, err.Error(), "{\"code\": 400002, \"msg\": \"栏目添加失败\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "栏目添加失败"}
 		c.ServeJSON()
 		return
 	}
 
-	AddLog(c.Ctx, "添加栏目 "+name, "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
-	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
+	AddLog(c.Ctx, "添加栏目 "+name, "", fmt.Sprintf("%s%v%s", "{\"code\": 200, \"msg\": \"OK\", \"data\": ", categoryId, "}"), "SUCCESS")
+	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK", Data: categoryId}
 	c.ServeJSON()
 }
 
