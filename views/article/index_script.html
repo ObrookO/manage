@@ -1,3 +1,5 @@
+{{assets_js "/js/sweetalert.js"}}
+
 <script>
     /**
      * 查询文章
@@ -12,4 +14,35 @@
         window.location.href = '{{urlfor "ArticleController.Get"}}' + '?c=' + category + '&s=' + isScroll + '&ac=' + allowComment + '&r=' +
             isRecommend + '&k=' + keyword;
     }
+
+    function changeStatus(id, status) {
+        swal({
+            title: '确定要转为草稿吗？',
+            buttons: ['取消', '确定'],
+            icon: 'warning'
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.post('{{urlfor "ArticleController.ChangeStatus"}}', {
+                    _xsrf: GToken,
+                    id: id,
+                    status: status
+                }, function (data) {
+                    if (data.code === 200) {
+                        swal({
+                            title: '操作成功',
+                            icon: 'success'
+                        }).then(function () {
+                            window.location.reload();
+                        })
+                    } else {
+                        swal({
+                            title: data.msg,
+                            icon: 'danger'
+                        })
+                    }
+                }, 'json')
+            }
+        })
+    }
+
 </script>

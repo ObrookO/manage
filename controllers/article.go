@@ -1,17 +1,13 @@
 package controllers
 
 import (
-	"errors"
 	"fmt"
-	"html/template"
 	"manage/models"
 	"os"
 	"path"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/astaxie/beego/validation"
 
 	utils2 "github.com/ObrookO/go-utils"
 
@@ -24,7 +20,6 @@ type ArticleController struct {
 
 var (
 	articlePageLimit  = 20                                              // 每页显示的文章数
-	allowFileType     = []string{"cover", "content"}                    // 允许的文件的key
 	filenamePrefixMap = map[string]string{"cover": "C", "content": "D"} // 图片的前缀
 	allowImageExt     = []string{".png", ".jpg", ".jpeg", ".gif"}       // 允许的图片类型
 	allowImageSize    = 1 << 21                                         // 2M // 允许的图片大小
@@ -39,7 +34,7 @@ func (c *ArticleController) Get() {
 	}
 
 	// 查询条件
-	filter := map[string]interface{}{}
+	filter := map[string]interface{}{"status": 1}
 	category, _ := c.GetInt("c")
 	if category > 0 {
 		filter["category_id"] = category
@@ -66,16 +61,13 @@ func (c *ArticleController) Get() {
 	categories, _ := models.GetCategories(nil)
 	articles, _ := models.GetArticles(filter, 0, articlePageLimit)
 
-	c.Data = map[interface{}]interface{}{
-		"xsrfdata":   template.HTML(c.XSRFFormHTML()),
-		"c":          category,
-		"s":          isScroll,
-		"ac":         allowComment,
-		"r":          isRecommend,
-		"keyword":    keyword,
-		"categories": categories,
-		"articles":   articles,
-	}
+	c.Data["c"] = category
+	c.Data["s"] = isScroll
+	c.Data["ac"] = allowComment
+	c.Data["r"] = isRecommend
+	c.Data["keyword"] = keyword
+	c.Data["categories"] = categories
+	c.Data["articles"] = articles
 }
 
 // AddArticle 添加文章页面
@@ -87,44 +79,43 @@ func (c *ArticleController) AddArticle() {
 		"Script": "article/add_script.html",
 	}
 
+	AddLog(c.Ctx, "添加文章页面", "", "PAGE", "SUCCESS")
+
 	categories, _ := models.GetCategories(nil)
 	tags, _ := models.GetTags(nil)
 
-	c.Data = map[interface{}]interface{}{
-		"xsrfdata":   template.HTML(c.XSRFFormHTML()),
-		"categories": categories,
-		"tags":       tags,
-	}
+	c.Data["categories"] = categories
+	c.Data["tags"] = tags
 }
 
 // UploadImage 上传图片
 func (c *ArticleController) UploadImage() {
-	c.EnableRender = false
-
-	fileType := c.GetString("type")
-	if !utils.InSlice(fileType, allowFileType) {
-		AddLog(c.Ctx, "上传图片", "图片类型错误", "{code: 400000, msg: \"图片上传失败\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "图片上传失败"}
-		c.ServeJSON()
-		return
-	}
-
 	fileKey := "file"
 	file, header, err := c.GetFile(fileKey)
-
 	if err != nil {
-		AddLog(c.Ctx, "上传图片", err.Error(), "{code: 400001, msg: \"图片上传失败\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "图片上传失败"}
+		AddLog(c.Ctx, "上传图片", err.Error(), "{code: 400000, msg: \"图片上传失败\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "图片上传失败"}
 		c.ServeJSON()
 		return
 	}
 
 	defer file.Close()
 
+	logContent := "上传图片 " + header.Filename
+	fileType := c.GetString("type")
+	allowFileType := []string{"cover", "content"}
+
+	if !utils.InSlice(fileType, allowFileType) {
+		AddLog(c.Ctx, logContent, "type错误", "{code: 400001, msg: \"参数错误\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "参数错误"}
+		c.ServeJSON()
+		return
+	}
+
 	// 判断文件后缀
 	ext := strings.ToLower(path.Ext(header.Filename))
 	if !utils.InSlice(ext, allowImageExt) {
-		AddLog(c.Ctx, "上传图片 "+header.Filename, "只允许上传png，gif，jpg，jpeg格式的图片", "{code: 400002, msg: \"只允许上传png，gif，jpg，jpeg格式的图片\"}", "FAIL")
+		AddLog(c.Ctx, logContent, "只允许上传png，gif，jpg，jpeg格式的图片", "{code: 400002, msg: \"只允许上传png，gif，jpg，jpeg格式的图片\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "只允许上传png，gif，jpg，jpeg格式的图片"}
 		c.ServeJSON()
 		return
@@ -133,7 +124,7 @@ func (c *ArticleController) UploadImage() {
 	// 判断文件大小
 	size := header.Size
 	if int(size) > allowImageSize {
-		AddLog(c.Ctx, "上传图片 "+header.Filename, "只允许上传2M以下的图片", "{code: 400003, msg: \"只允许上传2M以下的图片\"}", "FAIL")
+		AddLog(c.Ctx, logContent, "只允许上传2M以下的图片", "{code: 400003, msg: \"只允许上传2M以下的图片\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400003, Msg: "只允许上传2M以下的图片"}
 		c.ServeJSON()
 		return
@@ -141,21 +132,19 @@ func (c *ArticleController) UploadImage() {
 
 	filename := filenamePrefixMap[fileType] + time.Now().Format("20060102150405") + utils2.RandomStr(10) + ext
 	if err := c.SaveToFile(fileKey, "static/upload/"+filename); err != nil {
-		AddLog(c.Ctx, "上传图片 "+header.Filename, err.Error(), "{code: 400004, msg: \"图片上传失败\"}", "FAIL")
+		AddLog(c.Ctx, logContent, err.Error(), "{code: 400004, msg: \"图片上传失败\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400004, Msg: "图片上传失败"}
 		c.ServeJSON()
 		return
 	}
 
-	AddLog(c.Ctx, "上传图片 "+header.Filename+" 保存名称为 "+filename, "", "{code: 200, msg: \"OK\"}", "SUCCESS")
+	AddLog(c.Ctx, logContent+" 保存名称为 "+filename, "", "{code: 200, msg: \"OK\"}", "SUCCESS")
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK", Data: filename}
 	c.ServeJSON()
 }
 
 // Post 添加文章
 func (c *ArticleController) Post() {
-	c.EnableRender = false
-
 	article := &models.Article{}
 	if err := c.ParseForm(article); err != nil {
 		AddLog(c.Ctx, "添加文章", err.Error(), "{code: 400000, msg: \"添加文章失败\"}", "FAIL")
@@ -163,6 +152,8 @@ func (c *ArticleController) Post() {
 		c.ServeJSON()
 		return
 	}
+
+	logContent := "添加文章 " + article.Title
 
 	// 设置栏目
 	categoryId, _ := c.GetInt("categoryId")
@@ -181,7 +172,7 @@ func (c *ArticleController) Post() {
 
 	// 表单验证
 	if err := validData(article); err != nil {
-		AddLog(c.Ctx, "添加文章", err.Error(), "{code: 400001, msg: \""+err.Error()+"\"}", "FAIL")
+		AddLog(c.Ctx, logContent, err.Error(), "{code: 400001, msg: \""+err.Error()+"\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400001, Msg: err.Error()}
 		c.ServeJSON()
 		return
@@ -189,7 +180,7 @@ func (c *ArticleController) Post() {
 
 	// 验证栏目是否存在
 	if !models.IsCategoryExists(map[string]interface{}{"id": article.Category.Id}) {
-		AddLog(c.Ctx, "添加文章", "栏目不存在", "{code: 400002, msg: \"栏目不存在\"}", "FAIL")
+		AddLog(c.Ctx, logContent, "栏目不存在", "{code: 400002, msg: \"栏目不存在\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "栏目不存在"}
 		c.ServeJSON()
 		return
@@ -198,7 +189,7 @@ func (c *ArticleController) Post() {
 	// 验证封面是否存在
 	if _, err := os.Stat("static/upload/" + article.Cover); err != nil {
 		if os.IsNotExist(err) {
-			AddLog(c.Ctx, "添加文章", "封面不存在", "{code: 400004, msg: \"封面不存在\"}", "FAIL")
+			AddLog(c.Ctx, logContent, "封面不存在", "{code: 400004, msg: \"封面不存在\"}", "FAIL")
 			c.Data["json"] = &JSONResponse{Code: 400004, Msg: "封面不存在"}
 			c.ServeJSON()
 			return
@@ -207,14 +198,14 @@ func (c *ArticleController) Post() {
 
 	// 判断内容是否为空
 	if len(strings.TrimLeft(article.Content, "")) == 0 {
-		AddLog(c.Ctx, "添加文章", "内容不能为空", "{code: 400005, msg: \"内容不能为空\"}", "FAIL")
+		AddLog(c.Ctx, logContent, "内容不能为空", "{code: 400005, msg: \"内容不能为空\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400005, Msg: "内容不能为空"}
 		c.ServeJSON()
 		return
 	}
 
 	// 判断是否是草稿
-	if isDraft, _ := c.GetInt("is_draft"); isDraft != 1 {
+	if isDraft, _ := c.GetInt("isDraft"); isDraft != 1 {
 		article.Status = 1
 	}
 
@@ -223,14 +214,58 @@ func (c *ArticleController) Post() {
 		Id: ManagerInfo["uid"].(int),
 	}
 
-	if _, err := models.AddArticle(article); err != nil {
-		AddLog(c.Ctx, "添加文章", err.Error(), "{code: 400006, msg: \""+err.Error()+"\"}", "FAIL")
+	id, err := models.AddArticle(article)
+	if err != nil {
+		AddLog(c.Ctx, logContent, err.Error(), "{code: 400006, msg: \""+err.Error()+"\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400006, Msg: "添加文章失败"}
 		c.ServeJSON()
 		return
 	}
 
-	AddLog(c.Ctx, "添加文章", "", "{code: 200, msg: \"OK\"}", "SUCCESS")
+	AddLog(c.Ctx, logContent+fmt.Sprintf("文章id %v", id), "", "{code: 200, msg: \"OK\"}", "SUCCESS")
+	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
+	c.ServeJSON()
+}
+
+// ChangeStatus 修改文章状态
+func (c *ArticleController) ChangeStatus() {
+	id, _ := c.GetInt("id")
+	status, _ := c.GetInt("status", -1)
+
+	allowStatusSlice := []int{0, 1}
+	statusMap := map[int]string{0: "草稿", 1: "正常"}
+
+	// 判断状态
+	if !utils2.ObjInIntSlice(status, allowStatusSlice) {
+		AddLog(c.Ctx, "修改文章状态", "状态错误", "{code: 400000, msg: \"参数错误\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "参数错误"}
+		c.ServeJSON()
+		return
+	}
+
+	// 判断文章是否存在
+	article, _ := models.GetOneArticle(map[string]interface{}{"id": id})
+	if article.Id == 0 {
+		AddLog(c.Ctx, "修改文章状态", "文章不存在", "{code: 400001, msg: \"文章不存在\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "文章不存在"}
+		c.ServeJSON()
+		return
+	}
+
+	logContent := "修改文章 " + article.Title + " 状态为 " + statusMap[status]
+
+	// 更新文章状态
+	if _, err := models.UpdateArticle(map[string]interface{}{"id": id}, map[string]interface{}{
+		"status":     status,
+		"updated_at": time.Now().Format("2006-01-02 15:04:05"),
+	}); err != nil {
+		AddLog(c.Ctx, logContent, err.Error(), "{code: 400002, msg: \"操作失败\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "操作失败"}
+		c.ServeJSON()
+		return
+	}
+
+	AddLog(c.Ctx, logContent, "", "{code: 200, msg: \"OK\"}", "SUCCESS")
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
 	c.ServeJSON()
 }
@@ -238,20 +273,10 @@ func (c *ArticleController) Post() {
 // Draft 草稿箱
 func (c *ArticleController) Draft() {
 	c.Layout = "layouts/master.html"
-	c.TplName = "article/index.html"
-}
+	c.TplName = "article/draft.html"
 
-// validData
-func validData(data *models.Article) error {
-	v := validation.Validation{}
-	b, err := v.Valid(data)
-	if err != nil {
-		return err
-	}
+	filter := map[string]interface{}{"status": 0}
+	articles, _ := models.GetArticles(filter, 0, articlePageLimit)
 
-	if !b {
-		return errors.New(fmt.Sprintf("%s %s", v.Errors[0].Field, v.Errors[0].Message))
-	}
-
-	return nil
+	c.Data["articles"] = articles
 }

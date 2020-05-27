@@ -19,9 +19,8 @@
     // 修改用户的评论状态
     function changeCommentStatus(id, status) {
         if (window.confirm('确定执行此操作吗？')) {
-            let token = $('input[name=_xsrf]').val();
             $.post('{{urlfor "AccountController.ChangeCommentStatus"}}', {
-                _xsrf: token,
+                _xsrf: GToken,
                 id: id,
                 status: status
             }, function (data) {
@@ -37,9 +36,8 @@
     // 修改用户状态
     function changeUserStatus(id, status) {
         if (window.confirm('确定执行此操作吗？')) {
-            let token = $('input[name=_xsrf]').val();
             $.post('{{urlfor "AccountController.ChangeStatus"}}', {
-                _xsrf: token,
+                _xsrf: GToken,
                 id: id,
                 status: status
             }, function (data) {

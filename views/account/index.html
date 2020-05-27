@@ -17,8 +17,7 @@
                                     <option value="1" {{if eq .commentStatus 1}} selected {{end}}>允许评论</option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="form-group">
+
                             <label for="" class="col-lg-1 control-label">账号状态</label>
                             <div class="col-lg-3">
                                 <select class="form-control" name="" id="status" onchange="search()">
@@ -29,7 +28,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="" class="col-lg-1 control-label">搜索关键词</label>
+                            <label for="" class="col-lg-1 control-label">关键词</label>
                             <div class="col-lg-6">
                                 <input type="text" class="form-control" id="keyword" value="{{.keyword}}">
                             </div>
@@ -75,7 +74,8 @@
                                 <td>{{dateformat $account.UpdatedAt "2006-01-02 15:04:05"}}</td>
                                 <td>
                                     {{if $account.AllowComment}}
-                                        <button class="btn btn-warning btn-xs btn-outline" onclick="changeCommentStatus({{$account.Id}}, 0)">禁止评论</button>
+                                        <button class="btn btn-warning btn-xs btn-outline" onclick="changeCommentStatus({{$account.Id}}, 0)">禁止评论
+                                        </button>
                                     {{else}}
                                         <button class="btn btn-primary btn-xs" onclick="changeCommentStatus({{$account.Id}}, 1)">允许评论</button>
                                     {{end}}

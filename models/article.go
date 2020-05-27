@@ -35,8 +35,7 @@ func GetArticles(filter map[string]interface{}, offset int, limit int) ([]*Artic
 	return articles, err
 }
 
-// 获取文章总数
-// map[string]interface{} 查询条件
+// GetTotal 获取文章总数
 func GetTotal(where map[string]interface{}) (int64, error) {
 	needle := o.QueryTable("article")
 
@@ -90,4 +89,14 @@ func GetBeforeAndAfter(aid int) (int, int) {
 	}
 
 	return before, after
+}
+
+// UpdateArticle 更新文章
+func UpdateArticle(filter, values map[string]interface{}) (int64, error) {
+	needle := o.QueryTable("article")
+	for k, v := range filter {
+		needle = needle.Filter(k, v)
+	}
+
+	return needle.Update(values)
 }

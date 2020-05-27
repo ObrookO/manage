@@ -13,13 +13,11 @@ import (
 )
 
 type AuthController struct {
-	beego.Controller
+	BaseController
 }
 
 // 获取验证码
 func (c *AuthController) GetCaptcha() {
-	c.EnableRender = false
-
 	id, bs64, err := utils.GetCaptcha()
 	if err != nil {
 		AddLog(c.Ctx, "生成验证码", err.Error(), "{\"code\": 400000, \"msg\": \"获取验证码失败\"}", "FAIL")
@@ -39,37 +37,21 @@ func (c *AuthController) Login() {
 
 	AddLog(c.Ctx, "登录页面", "", "PAGE", "SUCCESS")
 
-	c.Data = map[interface{}]interface{}{
-		"xsrfdata": template.HTML(c.XSRFFormHTML()),
-	}
+	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 }
 
 // DoLogin 处理登录
 func (c *AuthController) DoLogin() {
-	c.EnableRender = false
-
 	captchaId := c.GetString("captcha_id")
 	captcha := c.GetString("captcha")
 	username := c.GetString("username")
 	password := c.GetString("password")
 
-	if username == "" {
-		AddLog(c.Ctx, "管理员登录后台", "请输入用户名", "{\"code\": 400000, \"msg\": \"请输入用户名\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "请输入用户名"}
-		c.ServeJSON()
-		return
-	}
-
-	if password == "" {
-		AddLog(c.Ctx, "管理员 "+username+" 登录后台", "请输入密码", "{\"code\": 400001, \"msg\": \"请输入密码\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "请输入密码"}
-		c.ServeJSON()
-		return
-	}
+	logContent := "管理员 " + username + " 登录后台"
 
 	if captcha == "" {
-		AddLog(c.Ctx, "管理员 "+username+" 登录后台", "请输入验证码", "{\"code\": 400002, \"msg\": \"请输入验证码\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "请输入验证码"}
+		AddLog(c.Ctx, logContent, "请输入验证码", "{\"code\": 400002, \"msg\": \"验证码错误\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "验证码错误"}
 		c.ServeJSON()
 		return
 	}
@@ -77,7 +59,7 @@ func (c *AuthController) DoLogin() {
 	// 校验验证码
 	if captchaId == "" {
 		if captcha != "08929" {
-			AddLog(c.Ctx, "管理员 "+username+" 登录后台", "验证码错误", "{\"code\": 400003, \"msg\": \"验证码错误\"}", "FAIL")
+			AddLog(c.Ctx, logContent, "验证码错误", "{\"code\": 400003, \"msg\": \"验证码错误\"}", "FAIL")
 			c.Data["json"] = &JSONResponse{Code: 400003, Msg: "验证码错误"}
 			c.ServeJSON()
 			return
@@ -85,7 +67,7 @@ func (c *AuthController) DoLogin() {
 	} else {
 		ca := base64Captcha.NewCaptcha(base64Captcha.DefaultDriverDigit, base64Captcha.DefaultMemStore)
 		if !ca.Verify(captchaId, captcha, true) {
-			AddLog(c.Ctx, "管理员 "+username+" 登录后台", "验证码错误", "{\"code\": 400004, \"msg\": \"验证码错误\"}", "FAIL")
+			AddLog(c.Ctx, logContent, "验证码错误", "{\"code\": 400004, \"msg\": \"验证码错误\"}", "FAIL")
 			c.Data["json"] = &JSONResponse{Code: 400004, Msg: "验证码错误"}
 			c.ServeJSON()
 			return
@@ -102,7 +84,7 @@ func (c *AuthController) DoLogin() {
 
 	manager, _ := models.GetOneManager(filter)
 	if manager.Id == 0 {
-		AddLog(c.Ctx, "管理员 "+username+" 登录后台", "用户名或密码错误", "{\"code\": 400005, \"msg\": \"用户名或密码错误\"}", "FAIL")
+		AddLog(c.Ctx, logContent, "用户名或密码错误", "{\"code\": 400005, \"msg\": \"用户名或密码错误\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400005, Msg: "用户名或密码错误"}
 		c.ServeJSON()
 		return
@@ -116,7 +98,7 @@ func (c *AuthController) DoLogin() {
 		"avatar":   manager.Avatar,
 	})
 
-	AddLog(c.Ctx, "管理员 "+username+" 登录后台", "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
+	AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
 	c.ServeJSON()
 }

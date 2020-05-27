@@ -154,7 +154,7 @@ type ArticleArchive struct {
 func init() {
 	// dev开启调试模式
 	if beego.BConfig.RunMode == "dev" {
-		orm.Debug = true
+		//orm.Debug = true
 	}
 
 	host := beego.AppConfig.String("db_host")

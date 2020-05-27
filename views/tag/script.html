@@ -1,11 +1,10 @@
 <script>
     function addTag(obj) {
         let modal = $(obj).parents('.modal'),
-            token = $('input[name=_xsrf]').val(),
             name = modal.find('#name').val();
 
         $.post('{{urlfor "TagController.Post"}}', {
-            _xsrf: token,
+            _xsrf: GToken,
             name: name,
         }, function (data) {
             if (data.code !== 200) {
@@ -30,12 +29,11 @@
     // 编辑标签
     function editTag(obj) {
         let modal = $(obj).parents('.modal'),
-            token = $('input[name=_xsrf]').val(),
             id = modal.find('#id').val(),
             name = modal.find('#name').val();
 
         $.post('{{urlfor "TagController.UpdateTag"}}', {
-            _xsrf: token,
+            _xsrf: GToken,
             id: id,
             name: name,
         }, function (data) {
@@ -50,9 +48,8 @@
     // 删除标签
     function deleteTag(id) {
         if (window.confirm('确定要删除吗？删除后无法恢复！！！')) {
-            let token = $('input[name=_xsrf]').val();
             $.post('{{urlfor "TagController.DeleteTag"}}', {
-                _xsrf: token,
+                _xsrf: GToken,
                 id: id
             }, function (data) {
                 if (data.code !== 200) {

@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"html/template"
 	"manage/models"
 	"strings"
 	"time"
@@ -49,93 +48,89 @@ func (c *AccountController) Get() {
 
 	accounts, _ := models.GetAccounts(filter)
 
-	c.Data = map[interface{}]interface{}{
-		"xsrfdata":      template.HTML(c.XSRFFormHTML()),
-		"commentStatus": commentStatus,
-		"status":        status,
-		"keyword":       keyword,
-		"accounts":      accounts,
-	}
+	c.Data["commentStatus"] = commentStatus
+	c.Data["status"] = status
+	c.Data["keyword"] = keyword
+	c.Data["accounts"] = accounts
 }
 
 // ChangeCommentStatus 修改账号的评论权限
 func (c *AccountController) ChangeCommentStatus() {
-	c.EnableRender = false
-
 	accountId, _ := c.GetInt("id")
 	status, _ := c.GetInt("status")
 	statusSlice := []string{"禁用", "启用"}
 
-	// 判断账号是否存在
-	account, _ := models.GetOneAccount(map[string]interface{}{"id": accountId})
-	if account.Id == 0 {
-		AddLog(c.Ctx, statusSlice[status]+"账号 "+account.Username+" 评论权限", "账号不存在", "{\"code\": 400000, \"msg\": \"账号不存在\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "账号不存在"}
+	// 判断status是否合法
+	if !utils.ObjInIntSlice(status, []int{0, 1}) {
+		AddLog(c.Ctx, "修改账号评论权限", "无效的status", "{\"code\": 400000, \"msg\": \"参数错误\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "无效的status"}
 		c.ServeJSON()
 		return
 	}
 
-	// 判断status是否合法
-	if !utils.ObjInIntSlice(status, []int{0, 1}) {
-		AddLog(c.Ctx, "修改账号 "+account.Username+" 评论权限", "无效的status", "{\"code\": 400001, \"msg\": \"无效的status\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "无效的status"}
+	// 判断账号是否存在
+	account, _ := models.GetOneAccount(map[string]interface{}{"id": accountId})
+	if account.Id == 0 {
+		AddLog(c.Ctx, "修改账号评论权限", "账号不存在", "{\"code\": 400001, \"msg\": \"账号不存在\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "账号不存在"}
 		c.ServeJSON()
 		return
 	}
+
+	logContent := statusSlice[status] + "账号 " + account.Username + " 评论权限"
 
 	// 修改账号信息
 	if _, err := models.UpdateAccount(map[string]interface{}{"id": accountId}, map[string]interface{}{
 		"allow_comment": status,
 		"updated_at":    time.Now().Format("2006-01-02 15:04:05"),
 	}); err != nil {
-		AddLog(c.Ctx, statusSlice[status]+"账号 "+account.Username+" 评论权限", err.Error(), "{\"code\": 400002, \"msg\": \"操作失败\"}", "FAIL")
+		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400002, \"msg\": \"操作失败\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "操作失败"}
 		c.ServeJSON()
 		return
 	}
 
-	AddLog(c.Ctx, statusSlice[status]+"账号 "+account.Username+" 评论权限", "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
+	AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
 	c.ServeJSON()
 }
 
 // ChangeStatus 修改账号的状态
 func (c *AccountController) ChangeStatus() {
-	c.EnableRender = false
-
 	accountId, _ := c.GetInt("id")
 	status, _ := c.GetInt("status")
 	statusSlice := []string{"禁用", "启用"}
 
+	// 判断status是否合法
+	if !utils.ObjInIntSlice(status, []int{0, 1}) {
+		AddLog(c.Ctx, "修改账号状态", "无效的status", "{\"code\": 400000, \"msg\": \"参数错误\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "参数错误"}
+		c.ServeJSON()
+		return
+	}
 	// 判断账号是否存在
 	account, _ := models.GetOneAccount(map[string]interface{}{"id": accountId})
 	if account.Id == 0 {
-		AddLog(c.Ctx, statusSlice[status]+"账号 "+account.Username, "账号不存在", "{\"code\": 400000, \"msg\": \"账号不存在\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "账号不存在"}
+		AddLog(c.Ctx, "修改账号状态", "账号不存在", "{\"code\": 400001, \"msg\": \"账号不存在\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "账号不存在"}
 		c.ServeJSON()
 		return
 	}
 
-	// 判断status是否合法
-	if !utils.ObjInIntSlice(status, []int{0, 1}) {
-		AddLog(c.Ctx, "修改账号 "+account.Username+" 状态", "无效的status", "{\"code\": 400001, \"msg\": \"无效的status\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "无效的status"}
-		c.ServeJSON()
-		return
-	}
+	logContent := statusSlice[status] + "账号 " + account.Username
 
 	// 修改账号信息
 	if _, err := models.UpdateAccount(map[string]interface{}{"id": accountId}, map[string]interface{}{
 		"status":     status,
 		"updated_at": time.Now().Format("2006-01-02 15:04:05"),
 	}); err != nil {
-		AddLog(c.Ctx, statusSlice[status]+"账号 "+account.Username, "", "{\"code\": 400002, \"msg\": \"操作失败\"}", "FAIL")
+		AddLog(c.Ctx, logContent, "", "{\"code\": 400002, \"msg\": \"操作失败\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "操作失败"}
 		c.ServeJSON()
 		return
 	}
 
-	AddLog(c.Ctx, statusSlice[status]+"账号 "+account.Username, "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
+	AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
 	c.ServeJSON()
 }

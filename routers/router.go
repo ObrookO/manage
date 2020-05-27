@@ -33,6 +33,7 @@ func init() {
 		beego.NSRouter("/", &controllers.ArticleController{}, "get:Get"),
 		beego.NSRouter("/uploadImage", &controllers.ArticleController{}, "post:UploadImage"),
 		beego.NSRouter("/create", &controllers.ArticleController{}, "get:AddArticle;post:Post"),
+		beego.NSRouter("/change", &controllers.ArticleController{}, "post:ChangeStatus"),
 		beego.NSRouter("/draft", &controllers.ArticleController{}, "get:Draft"),
 	)
 	// 点赞记录

@@ -2,11 +2,10 @@
     // 添加栏目
     function addCategory(obj) {
         let modal = $(obj).parents('.modal'),
-            token = $('input[name=_xsrf]').val(),
             name = modal.find('#name').val();
 
         $.post('{{urlfor "CategoryController.Post"}}', {
-            _xsrf: token,
+            _xsrf: GToken,
             name: name,
         }, function (data) {
             if (data.code !== 200) {
@@ -32,12 +31,11 @@
     // 编辑栏目
     function editCategory(obj) {
         let modal = $(obj).parents('.modal'),
-            token = $('input[name=_xsrf]').val(),
             id = modal.find('#id').val(),
             name = modal.find('#name').val();
 
         $.post('{{urlfor "CategoryController.UpdateCategory"}}', {
-            _xsrf: token,
+            _xsrf: GToken,
             id: id,
             name: name,
         }, function (data) {
@@ -53,9 +51,8 @@
     // 删除栏目
     function deleteCategory(id) {
         if (window.confirm('确定要删除吗？删除后无法恢复！！！')) {
-            let token = $('input[name=_xsrf]').val();
             $.post('{{urlfor "CategoryController.DeleteCategory"}}', {
-                _xsrf: token,
+                _xsrf: GToken,
                 id: id
             }, function (data) {
                 if (data.code !== 200) {

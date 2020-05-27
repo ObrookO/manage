@@ -35,6 +35,7 @@
         {{template "layouts/header.html"}}
 
         <div class="wrapper wrapper-content">
+            {{.xsrfdata}}
 
             {{.LayoutContent}}
 
@@ -53,6 +54,8 @@
 {{assets_js "/js/pace.min.js"}}
 
 <script>
+    let GToken = $('input[name=_xsrf]').val();
+
     $(function () {
         highlightMenu();
     });

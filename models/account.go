@@ -2,7 +2,7 @@ package models
 
 // IsAccountExists 判断账号是否存在
 func IsAccountExists(filter map[string]interface{}) bool {
-	needle := o.QueryTable("home_account")
+	needle := o.QueryTable("account")
 	for key, value := range filter {
 		needle = needle.Filter(key, value)
 	}
@@ -17,7 +17,7 @@ func AddAccount(data *Account) (int64, error) {
 
 // UpdateAccount 更新账号信息
 func UpdateAccount(filter, values map[string]interface{}) (int64, error) {
-	needle := o.QueryTable("home_account")
+	needle := o.QueryTable("account")
 	for key, value := range filter {
 		needle = needle.Filter(key, value)
 	}
@@ -29,7 +29,7 @@ func UpdateAccount(filter, values map[string]interface{}) (int64, error) {
 func GetOneAccount(filter map[string]interface{}) (Account, error) {
 	var account Account
 
-	needle := o.QueryTable("home_account")
+	needle := o.QueryTable("account")
 	for key, value := range filter {
 		needle = needle.Filter(key, value)
 	}
@@ -42,7 +42,7 @@ func GetOneAccount(filter map[string]interface{}) (Account, error) {
 func GetAccounts(filter map[string]interface{}) ([]*Account, error) {
 	var accounts []*Account
 
-	needle := o.QueryTable("home_account")
+	needle := o.QueryTable("account")
 	for key, value := range filter {
 		needle = needle.Filter(key, value)
 	}

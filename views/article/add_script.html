@@ -2,8 +2,7 @@
 <script>
     let E = window.wangEditor,
         filename = 'file',
-        editor = new E('#editor'),
-        token = $('input[name=_xsrf]').val();
+        editor = new E('#editor');
 
     // 定义图片上传路径
     editor.customConfig.uploadImgServer = '{{urlfor "ArticleController.UploadImage"}}';
@@ -11,7 +10,7 @@
     editor.customConfig.uploadFileName = filename;
     // 定义图片上传参数
     editor.customConfig.uploadImgParams = {
-        _xsrf: token,
+        _xsrf: GToken,
         type: 'content'
     };
     // 定义图片上传之后的插入功能
@@ -118,7 +117,7 @@
             type: 'post',
             dataType: 'json',
             data: {
-                _xsrf: token,
+                _xsrf: GToken,
                 title: title,
                 categoryId: categoryId,
                 tags: tags.join(','),
@@ -144,7 +143,7 @@
     }
 
     /**
-     * 显示添加栏目的input
+     * 显示添加栏目的label
      * @param obj
      */
     function showAddCategoryLabel(obj) {
@@ -162,12 +161,11 @@
      * @param obj
      */
     function addCategory(obj) {
-        let token = $('input[name=_xsrf]').val(),
-            name = $(obj).val();
+        let name = $(obj).val();
 
         if (name.length > 0) {
             $.post('{{urlfor "CategoryController.Post"}}', {
-                _xsrf: token,
+                _xsrf: GToken,
                 name: name,
             }, function (data) {
                 if (data.code === 200) {
@@ -202,12 +200,11 @@
      * @param obj
      */
     function addTag(obj) {
-        let token = $('input[name=_xsrf]').val(),
-            name = $(obj).val();
+        let name = $(obj).val();
 
         if (name.length > 0) {
             $.post('{{urlfor "TagController.Post"}}', {
-                _xsrf: token,
+                _xsrf: GToken,
                 name: name,
             }, function (data) {
                 if (data.code === 200) {
