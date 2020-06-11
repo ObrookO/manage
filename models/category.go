@@ -2,12 +2,7 @@ package models
 
 // IsCategoryExists 判断栏目是否存在
 func IsCategoryExists(filter map[string]interface{}) bool {
-	needle := o.QueryTable("category")
-	for key, value := range filter {
-		needle = needle.Filter(key, value)
-	}
-
-	return needle.Exist()
+	return concatFilter("category", filter).Exist()
 }
 
 // AddCategory 添加栏目
@@ -19,12 +14,7 @@ func AddCategory(data Category) (int64, error) {
 func GetCategories(filter map[string]interface{}) ([]*Category, error) {
 	var categories []*Category
 
-	needle := o.QueryTable("category")
-	for key, value := range filter {
-		needle = needle.Filter(key, value)
-	}
-
-	_, err := needle.All(&categories)
+	_, err := concatFilter("category", filter).All(&categories)
 	return categories, err
 }
 
@@ -32,31 +22,16 @@ func GetCategories(filter map[string]interface{}) ([]*Category, error) {
 func GetCategory(filter map[string]interface{}) (Category, error) {
 	var category Category
 
-	needle := o.QueryTable("category")
-	for key, value := range filter {
-		needle = needle.Filter(key, value)
-	}
-
-	err := needle.One(&category)
+	err := concatFilter("category", filter).One(&category)
 	return category, err
 }
 
 // DeleteCategory 删除栏目
 func DeleteCategory(filter map[string]interface{}) (int64, error) {
-	needle := o.QueryTable("category")
-	for key, value := range filter {
-		needle = needle.Filter(key, value)
-	}
-
-	return needle.Delete()
+	return concatFilter("category", filter).Delete()
 }
 
-// UpdateCategory 更新栏目
-func UpdateCategory(filter, values map[string]interface{}) (int64, error) {
-	needle := o.QueryTable("category")
-	for key, value := range filter {
-		needle = needle.Filter(key, value)
-	}
-
-	return needle.Update(values)
+// UpdateCategoryWithFilter 更新栏目
+func UpdateCategoryWithFilter(filter, values map[string]interface{}) (int64, error) {
+	return concatFilter("category", filter).Update(values)
 }

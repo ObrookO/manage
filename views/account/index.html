@@ -77,13 +77,13 @@
                                         <button class="btn btn-warning btn-xs btn-outline" onclick="changeCommentStatus({{$account.Id}}, 0)">禁止评论
                                         </button>
                                     {{else}}
-                                        <button class="btn btn-primary btn-xs" onclick="changeCommentStatus({{$account.Id}}, 1)">允许评论</button>
+                                        <button class="btn btn-primary btn-xs btn-outline" onclick="changeCommentStatus({{$account.Id}}, 1)">允许评论</button>
                                     {{end}}
 
                                     {{if $account.Status}}
-                                        <button class="btn btn-danger btn-xs" onclick="changeUserStatus({{$account.Id}}, 0)">禁用账号</button>
+                                        <button class="btn btn-danger btn-xs btn-outline" onclick="changeUserStatus({{$account.Id}}, 0)">禁用账号</button>
                                     {{else}}
-                                        <button class="btn btn-success btn-xs" onclick="changeUserStatus({{$account.Id}}, 1)">启用账号</button>
+                                        <button class="btn btn-success btn-xs btn-outline" onclick="changeUserStatus({{$account.Id}}, 1)">启用账号</button>
                                     {{end}}
                                 </td>
                             </tr>

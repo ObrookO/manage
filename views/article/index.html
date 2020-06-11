@@ -5,7 +5,7 @@
                 <div class="ibox-tools">
                     <h5>文章管理</h5>
                     <div class="ibox-tools">
-                        <a class="btn btn-primary btn-xs" href="{{urlfor "ArticleController.AddArticle"}}"><i class="fa fa-plus"></i> 添加文章</a>
+                        <a class="btn btn-primary btn-xs" href="{{urlfor "ArticleController.Add"}}"><i class="fa fa-plus"></i> 添加文章</a>
                     </div>
                 </div>
             </div>
@@ -52,6 +52,16 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label for="" class="col-lg-1 control-label">状态</label>
+                            <div class="col-lg-3">
+                                <select name="" id="status" class="form-control">
+                                    <option value="-1">不限</option>
+                                    <option value="0" {{if eq .st 0}}selected{{end}}>已撤回</option>
+                                    <option value="1" {{if eq .st 1}}selected{{end}}>已发布</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label for="" class="col-lg-1 control-label">关键词</label>
                             <div class="col-lg-8">
                                 <input type="text" class="form-control" id="keyword" value="{{.keyword}}">
@@ -73,15 +83,14 @@
                         <tr>
                             <th>#</th>
                             <th>标题</th>
+                            <th>关键词</th>
                             <th>所属栏目</th>
                             <th>标签</th>
                             <th>封面</th>
                             <th>是否轮播</th>
                             <th>是否推荐</th>
                             <th>允许评论</th>
-                            <th>点赞数</th>
                             <th>作者</th>
-                            <th>发布时间</th>
                             <th>更新时间</th>
                             <th>操作</th>
                         </tr>
@@ -91,14 +100,15 @@
                             <tr>
                                 <td>{{$index | add 1}}</td>
                                 <td>{{$article.Title}}</td>
+                                <td>{{$article.Keyword}}</td>
                                 <td>{{$article.Category.Name}}</td>
-                                <td>
+                                <td style="max-width: 260px">
                                     {{range $t := $article.Tags}}
-                                        <label class="label label-info"><i class="fa fa-tag"></i> {{$t.Name}}</label>
+                                        <label class="label label-info" style="display: inline-block;"><i class="fa fa-tag"></i> {{$t.Name}}</label>
                                     {{end}}
                                 </td>
                                 <td>
-                                    <img src="/uploads/{{$article.Cover}}" width="250" alt="">
+                                    <a href="/uploads/{{$article.Cover}}" target="_blank">{{$article.Cover}}</a>
                                 </td>
                                 <td>
                                     {{if $article.IsScroll}}
@@ -121,14 +131,16 @@
                                         <label for="" class="label label-danger">不允许</label>
                                     {{end}}
                                 </td>
-                                <td>{{$article.FavorNum}}</td>
                                 <td>{{$article.Manager.Nickname}}</td>
-                                <td>{{dateformat $article.CreatedAt "2006-01-02 15:04:05"}}</td>
                                 <td>{{dateformat $article.UpdatedAt "2006-01-02 15:04:05"}}</td>
                                 <td>
-                                    <button class="btn btn-primary btn-sm btn-outline">编辑</button>
-                                    <button class="btn btn-success btn-sm btn-outline" onclick="changeStatus({{$article.Id}}, 0)">转为草稿</button>
-                                    <button class="btn btn-danger btn-sm btn-outline">删除</button>
+                                    <a class="btn btn-primary btn-xs btn-outline" href="{{urlfor "ArticleController.Edit" ":id" $article.Id}}">编辑</a>
+                                    {{if eq $article.Status 1}}
+                                        <button class="btn btn-warning btn-xs btn-outline" onclick="changeStatus({{$article.Id}}, 0)">撤回</button>
+                                    {{else}}
+                                        <button class="btn btn-success btn-xs btn-outline" onclick="changeStatus({{$article.Id}}, 1)">发布</button>
+                                    {{end}}
+                                    <button class="btn btn-danger btn-xs btn-outline" onclick="deleteArticle({{$article.Id}})">删除</button>
                                 </td>
                             </tr>
                         {{end}}

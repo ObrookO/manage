@@ -46,7 +46,7 @@ func (c *AccountController) Get() {
 		}
 	}
 
-	accounts, _ := models.GetAccounts(filter)
+	accounts, _ := models.GetAllAccounts(filter)
 
 	c.Data["commentStatus"] = commentStatus
 	c.Data["status"] = status

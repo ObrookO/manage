@@ -20,13 +20,11 @@ type AuthController struct {
 func (c *AuthController) GetCaptcha() {
 	id, bs64, err := utils.GetCaptcha()
 	if err != nil {
-		AddLog(c.Ctx, "生成验证码", err.Error(), "{\"code\": 400000, \"msg\": \"获取验证码失败\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "获取验证码失败", Data: map[string]string{"id": "", "captcha": ""}}
 		c.ServeJSON()
 		return
 	}
 
-	AddLog(c.Ctx, "生成验证码", "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK", Data: map[string]string{"id": id, "captcha": bs64}}
 	c.ServeJSON()
 }
@@ -34,9 +32,6 @@ func (c *AuthController) GetCaptcha() {
 // Login 登录页面
 func (c *AuthController) Login() {
 	c.TplName = "auth/login.html"
-
-	AddLog(c.Ctx, "登录页面", "", "PAGE", "SUCCESS")
-
 	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 }
 

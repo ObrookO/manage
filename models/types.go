@@ -18,8 +18,8 @@ type Account struct {
 	Email        string    // 邮箱
 	Password     string    // 密码
 	Avatar       string    // 头像
-	AllowComment uint8     // 是否允许评论
-	Status       uint8     // 状态
+	AllowComment int8      // 是否允许评论
+	Status       int8      // 状态
 	CreatedAt    time.Time `orm:"auto_now_add;type(timestamp)"`
 	UpdatedAt    time.Time `orm:"auto_now;type(timestamp)"`
 }
@@ -44,19 +44,20 @@ type AdminLog struct {
 
 // Article 文章
 type Article struct {
-	Id           int
-	Title        string    `form:"title" valid:"Required"` // 标题
+	Id           int       `form:"id"`
+	Title        string    `form:"title" valid:"Required"`   // 标题
+	Keyword      string    `form:"keyword" valid:"Required"` // 关键词
 	Category     *Category `form:"categoryId" valid:"Required" orm:"rel(one)"`
 	Tags         []*Tag    `form:"tags" valid:"Required" orm:"rel(m2m);rel_through(manage/models.ArticleTag)"` // 标签
 	Description  string    `form:"description" valid:"Required"`                                               // 描述
 	Cover        string    `form:"cover" valid:"Required"`                                                     // 封面地址
 	Content      string    `form:"content" valid:"Required"`                                                   // 内容
-	IsScroll     uint8     `form:"isScroll" valid:"Match(0|1)"`                                                // 是否轮播
-	IsRecommend  uint8     `form:"isRecommend" valid:"Match(0|1)"`                                             // 是否推荐
-	AllowComment uint8     `form:"allowComment" valid:"Match(0|1)"`                                            // 是否允许评论
+	IsScroll     int8      `form:"isScroll" valid:"Match(0|1)"`                                                // 是否轮播
+	IsRecommend  int8      `form:"isRecommend" valid:"Match(0|1)"`                                             // 是否推荐
+	AllowComment int8      `form:"allowComment" valid:"Match(0|1)"`                                            // 是否允许评论
 	FavorNum     int       // 点赞数量
 	Manager      *Manager  `orm:"rel(one)"` // 管理员信息，即作者信息
-	Status       uint8     // 状态
+	Status       int8      // 状态
 	CreatedAt    time.Time `orm:"auto_now_add;type(timestamp)"` // 添加时间
 	UpdatedAt    time.Time `orm:"auto_now;type(timestamp)"`     // 修改时间
 }
@@ -79,24 +80,29 @@ type Category struct {
 
 // Comment 评论
 type Comment struct {
-	Id        int    `json:"id"`
-	Aid       int    `json:"aid"`
-	Username  string `json:"username"`
-	Content   string `json:"content"`
-	CreatedAt string
+	Id              int
+	Account         *Account `orm:"rel(one)"`
+	Article         *Article `orm:"rel(one)"`
+	OriginalContent string
+	ShowContent     string
+	Keyword         string // 违规关键词
+	Ip              string
+	CreatedAt       time.Time `orm:"auto_now_add;type(timestamp)"`
 }
 
 // FavorRecord 点赞记录
 type FavorRecord struct {
-	Id  int
-	Aid string
-	Ip  string
+	Id        int
+	Account   *Account `orm:"rel(one)"`
+	Article   *Article `orm:"rel(one)"`
+	Ip        string
+	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)"`
 }
 
 // HomeLog 前台日志
 type HomeLog struct {
 	Id        int
-	UserId    int
+	AccountId int
 	Ip        string
 	Url       string
 	Method    string

@@ -31,6 +31,7 @@ func (c *TagController) Get() {
 func (c *TagController) Post() {
 	name := c.GetString("name")
 	logContent := "添加标签 " + name
+
 	if len(name) == 0 || len([]rune(name)) > tagNameMaxLength {
 		AddLog(c.Ctx, logContent, "名称的长度为0-10", "{\"code\": 400000, \"msg\": \"名称的长度为0-10\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "名称的长度为0-10"}
@@ -127,7 +128,7 @@ func (c *TagController) UpdateTag() {
 		return
 	}
 
-	if _, err := models.UpdateTag(map[string]interface{}{"id": id}, map[string]interface{}{
+	if _, err := models.UpdateTagWithFilter(map[string]interface{}{"id": id}, map[string]interface{}{
 		"name":       name,
 		"updated_at": time.Now().Format("2006-01-02 15:04:05"),
 	}); err != nil {

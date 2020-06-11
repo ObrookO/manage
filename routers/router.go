@@ -31,10 +31,12 @@ func init() {
 	// 文章管理
 	ans := beego.NewNamespace("/articles",
 		beego.NSRouter("/", &controllers.ArticleController{}, "get:Get"),
-		beego.NSRouter("/uploadImage", &controllers.ArticleController{}, "post:UploadImage"),
-		beego.NSRouter("/create", &controllers.ArticleController{}, "get:AddArticle;post:Post"),
+		beego.NSRouter("/delete", &controllers.ArticleController{}, "post:Delete"),
 		beego.NSRouter("/change", &controllers.ArticleController{}, "post:ChangeStatus"),
-		beego.NSRouter("/draft", &controllers.ArticleController{}, "get:Draft"),
+		beego.NSRouter("/uploadImage", &controllers.ArticleController{}, "post:UploadImage"),
+		beego.NSRouter("/create", &controllers.ArticleController{}, "get:Add;post:Post"),
+		beego.NSRouter("/edit/:id", &controllers.ArticleController{}, "get:Edit"),
+		beego.NSRouter("/update", &controllers.ArticleController{}, "post:Update"),
 	)
 	// 点赞记录
 	fns := beego.NewNamespace("/favors",

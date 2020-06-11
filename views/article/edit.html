@@ -2,22 +2,23 @@
     <div class="col-lg-22">
         <div class="ibox">
             <div class="ibox-title">
-                <h5>添加文章</h5>
+                <h5>编辑文章</h5>
             </div>
             <div class="ibox-content">
-                <form action="{{urlfor "ArticleController.Post"}}" method="post" class="article_form form-horizontal">
+                <form action="{{urlfor "ArticleController.Update"}}" method="post" class="article_form form-horizontal">
                     {{.xsrfdata}}
-                    <input type="hidden" id="cover">
+                    <input type="hidden" id="id" name="id" value="{{.id}}">
+                    <input type="hidden" id="cover" name="cover" value="{{.article.Cover}}">
                     <div class="form-group">
                         <label for="" class="col-lg-2 control-label require_label">标题</label>
                         <div class="col-lg-8">
-                            <input type="text" class="form-control" id="title" placeholder="请填写标题">
+                            <input type="text" class="form-control" id="title" value="{{.article.Title}}" placeholder="请填写标题">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="" class="col-lg-2 control-label require_label">关键词</label>
                         <div class="col-lg-8">
-                            <input type="text" class="form-control" id="keyword" value="勤劳的码农" placeholder="请填写关键词">
+                            <input type="text" class="form-control" id="keyword" value="{{.article.Keyword}}" placeholder="请填写关键词">
                         </div>
                     </div>
                     <div class="form-group">
@@ -25,7 +26,8 @@
                         <div class="col-lg-5 category-container">
                             {{range $cate := .categories}}
                                 <label for="" class="radio-inline">
-                                    <input type="radio" value="{{$cate.Id}}" name="category"> {{$cate.Name}}
+                                    <input type="radio" value="{{$cate.Id}}" {{if eq $.article.Category.Id $cate.Id}} checked {{end}} name="category">
+                                    {{$cate.Name}}
                                 </label>
                             {{end}}
                         </div>
@@ -43,7 +45,8 @@
                         <div class="col-lg-8 tag-container">
                             {{range $tag := .tags}}
                                 <label for="" class="checkbox-inline">
-                                    <input type="checkbox" value="{{$tag.Id}}" name="tags"> {{$tag.Name}}
+                                    <input type="checkbox" value="{{$tag.Id}}" {{range $at := $.article.Tags}}{{if eq $at.Id $tag.Id}} checked
+                                           {{end}}{{end}}name="tags"> {{$tag.Name}}
                                 </label>
                             {{end}}
                         </div>
@@ -57,7 +60,8 @@
                     <div class="form-group">
                         <label for="" class="col-lg-2 control-label require_label">描述</label>
                         <div class="col-lg-8">
-                            <textarea id="description" cols="30" rows="5" class="form-control" style="resize: none" placeholder="请填写描述"></textarea>
+                            <textarea id="description" cols="30" rows="5" class="form-control" style="resize: none"
+                                      placeholder="请填写描述">{{.article.Description}}</textarea>
                         </div>
                     </div>
                     <div class="form-group">
@@ -70,7 +74,7 @@
                     <div class="form-group cover_preview_div">
                         <div class="col-lg-2"></div>
                         <div class="col-lg-8">
-                            <img src="" width="400" class="cover_preview" alt="">
+                            <img src="/uploads/{{.article.Cover}}" width="400" class="cover_preview" alt="">
                         </div>
                     </div>
                     <div class="form-group">
@@ -83,10 +87,10 @@
                         <label for="" class="col-lg-2 control-label require_label">是否轮播</label>
                         <div class="col-lg-8">
                             <label for="" class="radio-inline">
-                                <input type="radio" value="0" name="is_scroll" checked> 不轮播
+                                <input type="radio" value="0" name="is_scroll" {{if eq .article.IsScroll 0}} checked {{end}}> 不轮播
                             </label>
                             <label for="" class="radio-inline">
-                                <input type="radio" value="1" name="is_scroll"> 轮播
+                                <input type="radio" value="1" name="is_scroll" {{if eq .article.IsScroll 1}} checked {{end}}> 轮播
                             </label>
                         </div>
                     </div>
@@ -94,10 +98,10 @@
                         <label for="" class="col-lg-2 control-label require_label">是否推荐</label>
                         <div class="col-lg-8">
                             <label for="" class="radio-inline">
-                                <input type="radio" value="0" name="is_recommend" checked> 不推荐
+                                <input type="radio" value="0" name="is_recommend" {{if eq .article.IsRecommend 0}} checked {{end}}> 不推荐
                             </label>
                             <label for="" class="radio-inline">
-                                <input type="radio" value="1" name="is_recommend"> 推荐
+                                <input type="radio" value="1" name="is_recommend" {{if eq .article.IsRecommend 1}} checked {{end}}> 推荐
                             </label>
                         </div>
                     </div>
@@ -105,10 +109,10 @@
                         <label for="" class="col-lg-2 control-label require_label">允许评论</label>
                         <div class="col-lg-8">
                             <label for="" class="radio-inline">
-                                <input type="radio" value="0" name="allow_comment" checked> 不允许
+                                <input type="radio" value="0" name="allow_comment" {{if eq .article.AllowComment 0}} checked {{end}}> 不允许
                             </label>
                             <label for="" class="radio-inline">
-                                <input type="radio" value="1" name="allow_comment"> 允许
+                                <input type="radio" value="1" name="allow_comment" {{if eq .article.AllowComment 1}} checked {{end}}> 允许
                             </label>
                         </div>
                     </div>
@@ -116,11 +120,8 @@
                         <p class="text-danger text-center font-bold error"></p>
                     </div>
                     <div class="form-group">
-                        <div class="col-lg-6">
-                            <button type="button" class="btn btn-warning pull-right" onclick="addArticle(this, 1)">存为草稿</button>
-                        </div>
-                        <div class="col-lg-6">
-                            <button type="button" class="btn btn-primary" onclick="addArticle(this, 0)">保存</button>
+                        <div class="col-lg-12">
+                            <button type="button" class="btn btn-primary center-block" onclick="updateArticle(this)">保存</button>
                         </div>
                     </div>
                 </form>

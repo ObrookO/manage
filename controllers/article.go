@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	utils2 "github.com/ObrookO/go-utils"
-
 	"github.com/astaxie/beego/utils"
+
+	utils2 "github.com/ObrookO/go-utils"
 )
 
 type ArticleController struct {
@@ -34,7 +34,7 @@ func (c *ArticleController) Get() {
 	}
 
 	// 查询条件
-	filter := map[string]interface{}{"status": 1}
+	filter := map[string]interface{}{}
 	category, _ := c.GetInt("c")
 	if category > 0 {
 		filter["category_id"] = category
@@ -51,6 +51,10 @@ func (c *ArticleController) Get() {
 	if isRecommend > -1 {
 		filter["is_recommend"] = isRecommend
 	}
+	status, _ := c.GetInt("st", -1)
+	if status > -1 && utils2.ObjInIntSlice(status, []int{0, 1}) {
+		filter["status"] = status
+	}
 	keyword := c.GetString("k")
 	if len(keyword) > 0 {
 		filter["title__icontains"] = keyword
@@ -59,33 +63,85 @@ func (c *ArticleController) Get() {
 	AddLog(c.Ctx, "查看文章列表", "", "PAGE", "SUCCESS")
 
 	categories, _ := models.GetCategories(nil)
-	articles, _ := models.GetArticles(filter, 0, articlePageLimit)
+	articles, _ := models.GetAllArticles(filter)
 
 	c.Data["c"] = category
 	c.Data["s"] = isScroll
 	c.Data["ac"] = allowComment
 	c.Data["r"] = isRecommend
+	c.Data["st"] = status
 	c.Data["keyword"] = keyword
 	c.Data["categories"] = categories
 	c.Data["articles"] = articles
 }
 
-// AddArticle 添加文章页面
-func (c *ArticleController) AddArticle() {
-	c.Layout = "layouts/master.html"
-	c.TplName = "article/add.html"
-	c.LayoutSections = map[string]string{
-		"Style":  "article/add_style.html",
-		"Script": "article/add_script.html",
+// ChangeStatus 修改文章状态
+func (c *ArticleController) ChangeStatus() {
+	id, _ := c.GetInt("id")
+	status, _ := c.GetInt("status", -1)
+
+	allowStatusSlice := []int{0, 1}
+	statusMap := map[int]string{0: "草稿", 1: "正常"}
+
+	// 判断状态
+	if !utils2.ObjInIntSlice(status, allowStatusSlice) {
+		AddLog(c.Ctx, "修改文章状态", "状态错误", "{code: 400000, msg: \"参数错误\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "参数错误"}
+		c.ServeJSON()
+		return
 	}
 
-	AddLog(c.Ctx, "添加文章页面", "", "PAGE", "SUCCESS")
+	// 判断文章是否存在
+	article, _ := models.GetOneArticle(map[string]interface{}{"id": id})
+	if article.Id == 0 {
+		AddLog(c.Ctx, "修改文章状态", "文章不存在", "{code: 400001, msg: \"文章不存在\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "文章不存在"}
+		c.ServeJSON()
+		return
+	}
 
-	categories, _ := models.GetCategories(nil)
-	tags, _ := models.GetTags(nil)
+	logContent := "修改文章 " + article.Title + " 状态为 " + statusMap[status]
 
-	c.Data["categories"] = categories
-	c.Data["tags"] = tags
+	// 更新文章状态
+	if _, err := models.UpdateArticleWithFilter(map[string]interface{}{"id": id}, map[string]interface{}{
+		"status":     status,
+		"updated_at": time.Now().Format("2006-01-02 15:04:05"),
+	}); err != nil {
+		AddLog(c.Ctx, logContent, err.Error(), "{code: 400002, msg: \"操作失败\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "操作失败"}
+		c.ServeJSON()
+		return
+	}
+
+	AddLog(c.Ctx, logContent, "", "{code: 200, msg: \"OK\"}", "SUCCESS")
+	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
+	c.ServeJSON()
+}
+
+// Delete 删除文章
+func (c *ArticleController) Delete() {
+	id, _ := c.GetInt("id")
+	article, _ := models.GetOneArticle(map[string]interface{}{"id": id})
+	if article.Id == 0 {
+		AddLog(c.Ctx, "删除文章", "文章不存在", "{code: 400000, msg: \"文章不存在\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "文章不存在"}
+		c.ServeJSON()
+		return
+	}
+
+	logContent := "删除文章 " + article.Title
+	if _, err := models.DeleteArticle(map[string]interface{}{"id": id}); err != nil {
+		AddLog(c.Ctx, logContent, err.Error(), "{code: 400001, msg: \"文章删除失败\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "文章删除失败"}
+		c.ServeJSON()
+		return
+	}
+
+	// 删除封面图
+	os.Remove("static/upload/" + article.Cover)
+	AddLog(c.Ctx, logContent, "", "{code: 200, msg: \"OK\"}", "SUCCESS")
+	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
+	c.ServeJSON()
 }
 
 // UploadImage 上传图片
@@ -143,6 +199,22 @@ func (c *ArticleController) UploadImage() {
 	c.ServeJSON()
 }
 
+// Add 添加文章页面
+func (c *ArticleController) Add() {
+	c.Layout = "layouts/master.html"
+	c.TplName = "article/add.html"
+	c.LayoutSections = map[string]string{
+		"Style":  "article/add_style.html",
+		"Script": "article/add_script.html",
+	}
+
+	categories, _ := models.GetCategories(nil)
+	tags, _ := models.GetTags(nil)
+
+	c.Data["categories"] = categories
+	c.Data["tags"] = tags
+}
+
 // Post 添加文章
 func (c *ArticleController) Post() {
 	article := &models.Article{}
@@ -189,8 +261,8 @@ func (c *ArticleController) Post() {
 	// 验证封面是否存在
 	if _, err := os.Stat("static/upload/" + article.Cover); err != nil {
 		if os.IsNotExist(err) {
-			AddLog(c.Ctx, logContent, "封面不存在", "{code: 400004, msg: \"封面不存在\"}", "FAIL")
-			c.Data["json"] = &JSONResponse{Code: 400004, Msg: "封面不存在"}
+			AddLog(c.Ctx, logContent, "封面不存在", "{code: 400003, msg: \"封面不存在\"}", "FAIL")
+			c.Data["json"] = &JSONResponse{Code: 400003, Msg: "封面不存在"}
 			c.ServeJSON()
 			return
 		}
@@ -198,8 +270,8 @@ func (c *ArticleController) Post() {
 
 	// 判断内容是否为空
 	if len(strings.TrimLeft(article.Content, "")) == 0 {
-		AddLog(c.Ctx, logContent, "内容不能为空", "{code: 400005, msg: \"内容不能为空\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400005, Msg: "内容不能为空"}
+		AddLog(c.Ctx, logContent, "内容不能为空", "{code: 400004, msg: \"内容不能为空\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400004, Msg: "内容不能为空"}
 		c.ServeJSON()
 		return
 	}
@@ -216,8 +288,8 @@ func (c *ArticleController) Post() {
 
 	id, err := models.AddArticle(article)
 	if err != nil {
-		AddLog(c.Ctx, logContent, err.Error(), "{code: 400006, msg: \""+err.Error()+"\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400006, Msg: "添加文章失败"}
+		AddLog(c.Ctx, logContent, err.Error(), "{code: 400005, msg: \""+err.Error()+"\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400005, Msg: "添加文章失败"}
 		c.ServeJSON()
 		return
 	}
@@ -227,40 +299,104 @@ func (c *ArticleController) Post() {
 	c.ServeJSON()
 }
 
-// ChangeStatus 修改文章状态
-func (c *ArticleController) ChangeStatus() {
-	id, _ := c.GetInt("id")
-	status, _ := c.GetInt("status", -1)
+// Edit 编辑文章页面
+func (c *ArticleController) Edit() {
+	c.Layout = "layouts/master.html"
+	c.TplName = "article/edit.html"
+	c.LayoutSections = map[string]string{
+		"Style":  "article/edit_style.html",
+		"Script": "article/edit_script.html",
+	}
 
-	allowStatusSlice := []int{0, 1}
-	statusMap := map[int]string{0: "草稿", 1: "正常"}
+	id, _ := c.GetInt(":id")
+	article, _ := models.GetOneArticle(map[string]interface{}{"id": id})
+	if article.Id == 0 {
+		// 此处需要自定义404页面
+		c.Abort("404")
+	}
 
-	// 判断状态
-	if !utils2.ObjInIntSlice(status, allowStatusSlice) {
-		AddLog(c.Ctx, "修改文章状态", "状态错误", "{code: 400000, msg: \"参数错误\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "参数错误"}
+	categories, _ := models.GetCategories(nil)
+	tags, _ := models.GetTags(nil)
+
+	c.Data["categories"] = categories
+	c.Data["id"] = id
+	c.Data["tags"] = tags
+	c.Data["article"] = article
+}
+
+// Update 更新文章
+func (c *ArticleController) Update() {
+	article := &models.Article{}
+	if err := c.ParseForm(article); err != nil {
+		AddLog(c.Ctx, "更新文章", err.Error(), "{code: 400000, msg: \"更新文章失败\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "更新文章失败"}
 		c.ServeJSON()
 		return
 	}
 
 	// 判断文章是否存在
-	article, _ := models.GetOneArticle(map[string]interface{}{"id": id})
-	if article.Id == 0 {
-		AddLog(c.Ctx, "修改文章状态", "文章不存在", "{code: 400001, msg: \"文章不存在\"}", "FAIL")
+	if !models.IsArticleExists(map[string]interface{}{"id": article.Id}) {
+		AddLog(c.Ctx, "更新文章", "文章不存在", "{code: 400001, msg: \"文章不存在\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "文章不存在"}
 		c.ServeJSON()
 		return
 	}
 
-	logContent := "修改文章 " + article.Title + " 状态为 " + statusMap[status]
+	logContent := "更新文章 " + article.Title
 
-	// 更新文章状态
-	if _, err := models.UpdateArticle(map[string]interface{}{"id": id}, map[string]interface{}{
-		"status":     status,
-		"updated_at": time.Now().Format("2006-01-02 15:04:05"),
-	}); err != nil {
-		AddLog(c.Ctx, logContent, err.Error(), "{code: 400002, msg: \"操作失败\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "操作失败"}
+	// 设置栏目
+	categoryId, _ := c.GetInt("categoryId")
+	article.Category = &models.Category{
+		Id: categoryId,
+	}
+
+	// 设置标签
+	tags := c.GetString("tags")
+	for _, t := range strings.Split(tags, ",") {
+		if models.IsTagExists(map[string]interface{}{"id": t}) {
+			tagId, _ := strconv.Atoi(t)
+			article.Tags = append(article.Tags, &models.Tag{Id: tagId})
+		}
+	}
+
+	// 表单验证
+	if err := validData(article); err != nil {
+		AddLog(c.Ctx, logContent, err.Error(), "{code: 400002, msg: \""+err.Error()+"\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400002, Msg: err.Error()}
+		c.ServeJSON()
+		return
+	}
+
+	// 验证栏目是否存在
+	if !models.IsCategoryExists(map[string]interface{}{"id": article.Category.Id}) {
+		AddLog(c.Ctx, logContent, "栏目不存在", "{code: 400003, msg: \"栏目不存在\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400003, Msg: "栏目不存在"}
+		c.ServeJSON()
+		return
+	}
+
+	// 验证封面是否存在
+	if _, err := os.Stat("static/upload/" + article.Cover); err != nil {
+		if os.IsNotExist(err) {
+			AddLog(c.Ctx, logContent, "封面不存在", "{code: 400004, msg: \"封面不存在\"}", "FAIL")
+			c.Data["json"] = &JSONResponse{Code: 400004, Msg: "封面不存在"}
+			c.ServeJSON()
+			return
+		}
+	}
+
+	// 判断内容是否为空
+	if len(strings.TrimLeft(article.Content, "")) == 0 {
+		AddLog(c.Ctx, logContent, "内容不能为空", "{code: 400005, msg: \"内容不能为空\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400005, Msg: "内容不能为空"}
+		c.ServeJSON()
+		return
+	}
+
+	if _, err := models.UpdateArticle(article, "title", "keyword", "category_id", "description", "cover", "content", "is_scroll", "is_recommend",
+		"allow_comment"); err != nil {
+		AddLog(c.Ctx, logContent, err.Error(), "{code: 400006, msg: \"文章更新失败\"}", "FAIL")
+		c.Data["json"] = &JSONResponse{Code: 400006, Msg: "文章更新失败"}
 		c.ServeJSON()
 		return
 	}
@@ -268,15 +404,5 @@ func (c *ArticleController) ChangeStatus() {
 	AddLog(c.Ctx, logContent, "", "{code: 200, msg: \"OK\"}", "SUCCESS")
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
 	c.ServeJSON()
-}
-
-// Draft 草稿箱
-func (c *ArticleController) Draft() {
-	c.Layout = "layouts/master.html"
-	c.TplName = "article/draft.html"
-
-	filter := map[string]interface{}{"status": 0}
-	articles, _ := models.GetArticles(filter, 0, articlePageLimit)
-
-	c.Data["articles"] = articles
+	return
 }

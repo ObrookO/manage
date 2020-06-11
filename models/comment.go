@@ -5,27 +5,15 @@ func AddComment(value *Comment) (int64, error) {
 	return o.Insert(value)
 }
 
-// 获取所有评论
-func GetComments(where map[string]interface{}) ([]Comment, int64, error) {
-	var comments []Comment
-	needle := o.QueryTable("comment")
+// GetAllComments 获取所有评论
+func GetAllComments(filter map[string]interface{}) ([]*Comment, error) {
+	var comments []*Comment
 
-	for key, value := range where {
-		needle = needle.Filter(key, value)
-	}
-
-	rows, err := needle.OrderBy("-id").Limit(20).All(&comments)
-
-	return comments, rows, err
+	_, err := concatFilter("comment", filter).OrderBy("-id").RelatedSel().All(&comments)
+	return comments, err
 }
 
 // 获取的评论数量
-func GetCommentsCount(where map[string]interface{}) (int64, error) {
-	needle := o.QueryTable("comment")
-
-	for key, value := range where {
-		needle = needle.Filter(key, value)
-	}
-
-	return needle.Count()
+func GetCommentsCount(filter map[string]interface{}) (int64, error) {
+	return concatFilter("comment", filter).Count()
 }

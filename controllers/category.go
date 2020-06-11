@@ -30,8 +30,8 @@ func (c *CategoryController) Get() {
 // Post 添加栏目
 func (c *CategoryController) Post() {
 	name := c.GetString("name")
-
 	logContent := "添加栏目 " + name
+
 	if len(name) == 0 || len([]rune(name)) > categoryNameMaxLength {
 		AddLog(c.Ctx, logContent, "名称的长度为0-10", "{\"code\": 400000, \"msg\": \"名称的长度为0-10\"}", "FAIL")
 		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "名称的长度为0-10"}
@@ -127,7 +127,7 @@ func (c *CategoryController) UpdateCategory() {
 		return
 	}
 
-	if _, err := models.UpdateCategory(map[string]interface{}{"id": id}, map[string]interface{}{
+	if _, err := models.UpdateCategoryWithFilter(map[string]interface{}{"id": id}, map[string]interface{}{
 		"name":       name,
 		"updated_at": time.Now().Format("2006-01-02 15:04:05"),
 	}); err != nil {

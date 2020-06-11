@@ -9,11 +9,6 @@ func AddAdminLog(data AdminLog) (int64, error) {
 func GetAdminLogs(filter map[string]interface{}, offset, limit int) ([]*AdminLog, error) {
 	var logs []*AdminLog
 
-	needle := o.QueryTable("admin_log")
-	for key, value := range filter {
-		needle = needle.Filter(key, value)
-	}
-
-	_, err := needle.Offset(offset).Limit(limit).OrderBy("-id").All(&logs)
+	_, err := concatFilter("admin_log", filter).Offset(offset).Limit(limit).OrderBy("-id").All(&logs)
 	return logs, err
 }

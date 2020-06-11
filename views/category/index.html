@@ -28,8 +28,8 @@
                                 <td>{{$cate.ArticleNum}}</td>
                                 <td>{{dateformat $cate.CreatedAt "2006-01-02 15:04:05"}}</td>
                                 <td>
-                                    <button class="btn btn-primary btn-xs" onclick="showEditModal(this, {{$cate.Id}})">编辑</button>
-                                    <button class="btn btn-danger btn-xs" onclick="deleteCategory({{$cate.Id}})">删除</button>
+                                    <button class="btn btn-primary btn-xs btn-outline" onclick="showEditModal(this, {{$cate.Id}})">编辑</button>
+                                    <button class="btn btn-danger btn-xs btn-outline" onclick="deleteCategory({{$cate.Id}})">删除</button>
                                 </td>
                             </tr>
                         {{end}}

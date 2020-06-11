@@ -4,6 +4,31 @@
         filename = 'file',
         editor = new E('#editor');
 
+    // 自定义菜单
+    editor.customConfig.menus = [
+        'head',  // 标题
+        'bold',  // 粗体
+        'fontSize',  // 字号
+        'fontName',  // 字体
+        'italic',  // 斜体
+        'underline',  // 下划线
+        'strikeThrough',  // 删除线
+        'foreColor',  // 文字颜色
+        'backColor',  // 背景颜色
+        'link',  // 插入链接
+        'list',  // 列表
+        'justify',  // 对齐方式
+        'quote',  // 引用
+        'image',  // 插入图片
+        'table',  // 表格
+        'code',  // 插入代码
+        'undo',  // 撤销
+        'redo'  // 重复
+    ];
+    // 隐藏网络图片
+    editor.customConfig.showLinkImg = false;
+    // 显示本地上传
+    editor.customConfig.uploadImgShowBase64 = true;
     // 定义图片上传路径
     editor.customConfig.uploadImgServer = '{{urlfor "ArticleController.UploadImage"}}';
     // 定义图片上传名称
@@ -19,6 +44,8 @@
             insertImg('/uploads/' + result.data);
         }
     };
+    editor.create();
+    editor.txt.html('{{.article.Content}}');
 
     $(function () {
         // 高亮菜单
@@ -27,38 +54,15 @@
         $('.upload_button').on('click', function () {
             $('input.cover').click();
         });
-
-        editor.customConfig.menus = [
-            'head',  // 标题
-            'bold',  // 粗体
-            'fontSize',  // 字号
-            'fontName',  // 字体
-            'italic',  // 斜体
-            'underline',  // 下划线
-            'strikeThrough',  // 删除线
-            'foreColor',  // 文字颜色
-            'backColor',  // 背景颜色
-            'link',  // 插入链接
-            'list',  // 列表
-            'justify',  // 对齐方式
-            'quote',  // 引用
-            'image',  // 插入图片
-            'table',  // 表格
-            'code',  // 插入代码
-            'undo',  // 撤销
-            'redo'  // 重复
-        ];
-        editor.customConfig.showLinkImg = false;
-        editor.customConfig.uploadImgShowBase64 = true;
-        editor.create();
     });
 
     /**
      * 添加文章
      * @param obj
      */
-    function addArticle(obj, is_draft) {
+    function updateArticle(obj) {
         let form = $(obj).parents('.article_form'),
+            id = form.find('#id').val(),
             title = form.find('#title').val(),
             keyword = form.find('#keyword').val(),
             categoryId = form.find('[name=category]:checked').val(),
@@ -81,6 +85,7 @@
             dataType: 'json',
             data: {
                 _xsrf: GToken,
+                id : id,
                 title: title,
                 keyword: keyword,
                 categoryId: categoryId,
@@ -91,7 +96,6 @@
                 isScroll: isScroll,
                 isRecommend: isRecommend,
                 allowComment: allowComment,
-                isDraft: is_draft,
             },
             success: function (data) {
                 if (data.code !== 200) {

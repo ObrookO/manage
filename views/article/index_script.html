@@ -9,19 +9,25 @@
             isScroll = $('#isScroll').val(),
             allowComment = $('#allowComment').val(),
             isRecommend = $('#isRecommend').val(),
+            status = $('#status').val(),
             keyword = $('#keyword').val();
 
         window.location.href = '{{urlfor "ArticleController.Get"}}' + '?c=' + category + '&s=' + isScroll + '&ac=' + allowComment + '&r=' +
-            isRecommend + '&k=' + keyword;
+            isRecommend + '&st=' + status + '&k=' + keyword;
     }
 
+    /**
+     * 撤回/发布文章
+     * @param id
+     * @param status
+     */
     function changeStatus(id, status) {
         swal({
-            title: '确定要转为草稿吗？',
+            title: '确定要执行该操作吗？',
             buttons: ['取消', '确定'],
             icon: 'warning'
-        }).then(function (willDelete) {
-            if (willDelete) {
+        }).then(function (opt) {
+            if (opt) {
                 $.post('{{urlfor "ArticleController.ChangeStatus"}}', {
                     _xsrf: GToken,
                     id: id,
@@ -45,4 +51,36 @@
         })
     }
 
+    /**
+     * 删除文章
+     * @param id
+     */
+    function deleteArticle(id) {
+        swal({
+            title: '确定要删除吗？',
+            buttons: ['取消', '确定'],
+            icon: 'warning'
+        }).then(function (opt) {
+            if (opt) {
+                $.post('{{urlfor "ArticleController.Delete"}}', {
+                    _xsrf: GToken,
+                    id: id,
+                }, function (data) {
+                    if (data.code === 200) {
+                        swal({
+                            title: '操作成功',
+                            icon: 'success'
+                        }).then(function () {
+                            window.location.reload();
+                        })
+                    } else {
+                        swal({
+                            title: data.msg,
+                            icon: 'danger'
+                        })
+                    }
+                }, 'json');
+            }
+        })
+    }
 </script>

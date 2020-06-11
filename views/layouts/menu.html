@@ -37,13 +37,9 @@
                 </a>
             </li>
             <li>
-                <a href="javascript:;">
-                    <i class="fa fa-pencil"></i> <span class="nav-label">文章管理</span> <span class="fa arrow"></span>
+                <a href="{{urlfor "ArticleController.Get"}}">
+                    <i class="fa fa-pencil"></i> <span class="nav-label">文章管理</span>
                 </a>
-                <ul class="nav nav-second-level">
-                    <li><a href="{{urlfor "ArticleController.Get"}}">文章列表</a></li>
-                    <li><a href="{{urlfor "ArticleController.Draft"}}">草稿箱</a></li>
-                </ul>
             </li>
             <li>
                 <a href="{{urlfor "FavorRecordController.Get"}}">
@@ -57,7 +53,7 @@
                 </a>
                 <ul class="nav nav-second-level">
                     <li><a href="{{urlfor "CommentController.Get"}}">评论列表</a></li>
-                    <li><a href="{{urlfor "CommentController.Keyword"}}">屏蔽关键词</a></li>
+                    <li><a href="{{urlfor "CommentController.Keyword"}}">过滤关键词</a></li>
                 </ul>
             </li>
             <li>

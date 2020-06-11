@@ -1,0 +1,24 @@
+{{assets_js "/js/chosen.jquery.js"}}
+
+<script>
+    let config = {
+        '.chosen-select': {width: "100%"},
+        '.chosen-select-deselect': {allow_single_deselect: true},
+        '.chosen-select-no-single': {disable_search_threshold: 10},
+        '.chosen-select-no-results': {no_results_text: 'Oops, nothing found!'},
+        '.chosen-select-width': {width: "95%"}
+    };
+    for (var selector in config) {
+        $(selector).chosen(config[selector]);
+    }
+
+    /**
+     * 搜索评论
+     */
+    function searchComment() {
+        let article = $('#article').val(),
+            account = $('#account').val();
+
+        window.location.href = '{{urlfor "CommentController.Get"}}' + '?ar=' + article + '&ac=' + account;
+    }
+</script>

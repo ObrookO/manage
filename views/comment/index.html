@@ -1,0 +1,81 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>评论列表</h5>
+            </div>
+            <div class="ibox-content">
+                <div class="row">
+                    <div class="col-lg-12 form-horizontal">
+                        <div class="form-group">
+                            <label for="" class="col-lg-1 control-label">所属文章</label>
+                            <div class="col-lg-4">
+                                <select class="chosen-select" name="" id="article">
+                                    <option value="-1">请选择</option>
+                                    {{range $article := .articles}}
+                                        <option value="{{$article.Id}}" {{if eq $article.Id $.ar}} selected {{end}}>{{$article.Title}} - {{$article.Manager.Nickname}}</option>
+                                    {{end}}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-lg-1 control-label">账号</label>
+                            <div class="col-lg-4">
+                                <select class="chosen-select" name="" id="account">
+                                    <option value="-1">请选择</option>
+                                    {{range $account := .accounts}}
+                                        <option value="{{$account.Id}}" {{if eq $account.Id $.ac}} selected {{end}}>{{$account.Username}}</option>
+                                    {{end}}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-lg-1 control-label"></label>
+                            <div class="col-lg-4">
+                                <button class="btn btn-primary btn-sm" onclick="searchComment()">查询</button>
+                                <a class="btn btn-default btn-sm" href="{{urlfor "CommentController.Get"}}">重置</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>账号</th>
+                            <th>文章标题</th>
+                            <th>文章作者</th>
+                            <th>原始内容</th>
+                            <th>显示内容</th>
+                            <th>违规内容</th>
+                            <th>IP</th>
+                            <th>评论时间</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{range $index, $comment := .comments}}
+                            <tr>
+                                <td>{{$index | add 1}}</td>
+                                <td>{{$comment.Account.Username}}</td>
+                                <td>{{$comment.Article.Title}}</td>
+                                <td>{{$comment.Article.Manager.Nickname}}</td>
+                                <td>{{$comment.OriginalContent}}</td>
+                                <td>
+                                    <label for="" class="label label-info">{{$comment.ShowContent}}</label>
+                                </td>
+                                <td>
+                                    <label for="" class="label label-danger">{{$comment.Keyword}}</label>
+                                </td>
+                                <td>{{$comment.Ip}}</td>
+                                <td>{{dateformat $comment.CreatedAt "2006-01-02 15:04:05"}}</td>
+                            </tr>
+                        {{end}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
