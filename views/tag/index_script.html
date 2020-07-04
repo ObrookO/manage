@@ -1,4 +1,18 @@
 <script>
+    $(function () {
+        $('.tag-table').DataTable({
+            searching: false,
+            ordering: false,
+            info: false,
+            lengthChange: false,
+            pageLength: 20,
+            language: {
+                emptyTable: '暂无数据'
+            }
+        });
+    });
+
+    // 添加标签
     function addTag(obj) {
         let modal = $(obj).parents('.modal'),
             name = modal.find('#name').val();
@@ -7,10 +21,10 @@
             _xsrf: GToken,
             name: name,
         }, function (data) {
-            if (data.code !== 200) {
-                modal.find('.error').text(data.msg)
-            } else {
+            if (data.code === 200) {
                 window.location.reload();
+            } else {
+                modal.find('.error').text(data.msg);
             }
         }, 'json')
     }
@@ -37,28 +51,30 @@
             id: id,
             name: name,
         }, function (data) {
-            if (data.code !== 200) {
-                modal.find('.error').text(data.msg);
-            } else {
+            if (data.code === 200) {
                 window.location.reload();
+            } else {
+                modal.find('.error').text(data.msg);
             }
         }, 'json')
     }
 
     // 删除标签
     function deleteTag(id) {
-        if (window.confirm('确定要删除吗？删除后无法恢复！！！')) {
-            $.post('{{urlfor "TagController.DeleteTag"}}', {
-                _xsrf: GToken,
-                id: id
-            }, function (data) {
-                if (data.code !== 200) {
-                    alert(data.msg);
-                }
-
-                window.location.reload();
-            }, 'json')
-        }
+        swal({
+            title: '确定要删除吗？',
+            buttons: ['取消', '确定'],
+            icon: 'warning'
+        }).then(function (opt) {
+            if (opt) {
+                $.post('{{urlfor "TagController.DeleteTag"}}', {
+                    _xsrf: GToken,
+                    id: id
+                }, function (data) {
+                    ajaxRequestSuccess(data);
+                }, 'json')
+            }
+        });
     }
 </script>
 

@@ -5,22 +5,22 @@
                 <h5>账号管理</h5>
             </div>
             <div class="ibox-content">
-                {{.xsrfdata}}
                 <div class="row">
                     <div class="col-lg-12 form-horizontal">
                         <div class="form-group">
                             <label for="" class="col-lg-1 control-label">评论权限</label>
-                            <div class="col-lg-3">
-                                <select class="form-control" name="" id="comment-status" onchange="search()">
+                            <div class="col-lg-4">
+                                <select class="form-control" name="" id="comment-status">
                                     <option value="-1" {{if eq .commentStatus -1}} selected {{end}}>不限</option>
                                     <option value="0" {{if eq .commentStatus 0}} selected {{end}}>禁止评论</option>
                                     <option value="1" {{if eq .commentStatus 1}} selected {{end}}>允许评论</option>
                                 </select>
                             </div>
-
+                        </div>
+                        <div class="form-group">
                             <label for="" class="col-lg-1 control-label">账号状态</label>
-                            <div class="col-lg-3">
-                                <select class="form-control" name="" id="status" onchange="search()">
+                            <div class="col-lg-4">
+                                <select class="form-control" name="" id="status">
                                     <option value="-1" {{if eq .status -1}} selected {{end}}>不限</option>
                                     <option value="1" {{if eq .status 1}} selected {{end}}>可用</option>
                                     <option value="0" {{if eq .status 0}} selected {{end}}>不可用</option>
@@ -29,15 +29,22 @@
                         </div>
                         <div class="form-group">
                             <label for="" class="col-lg-1 control-label">关键词</label>
-                            <div class="col-lg-6">
-                                <input type="text" class="form-control" id="keyword" value="{{.keyword}}">
+                            <div class="col-lg-8">
+                                <input type="text" class="form-control" id="keyword" value="{{.keyword}}" placeholder="请输入用户名或邮箱">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-lg-1 control-label"></label>
+                            <div class="col-lg-4">
+                                <button class="btn btn-primary btn-sm" onclick="searchAccount()">查询</button>
+                                <a class="btn btn-default btn-sm" href="{{urlfor "AccountController.Get"}}">重置</a>
                             </div>
                         </div>
                     </div>
                 </div>
                 <hr>
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover account-table">
                         <thead>
                         <tr>
                             <th>#</th>
@@ -77,13 +84,15 @@
                                         <button class="btn btn-warning btn-xs btn-outline" onclick="changeCommentStatus({{$account.Id}}, 0)">禁止评论
                                         </button>
                                     {{else}}
-                                        <button class="btn btn-primary btn-xs btn-outline" onclick="changeCommentStatus({{$account.Id}}, 1)">允许评论</button>
+                                        <button class="btn btn-primary btn-xs btn-outline" onclick="changeCommentStatus({{$account.Id}}, 1)">允许评论
+                                        </button>
                                     {{end}}
 
                                     {{if $account.Status}}
                                         <button class="btn btn-danger btn-xs btn-outline" onclick="changeUserStatus({{$account.Id}}, 0)">禁用账号</button>
                                     {{else}}
-                                        <button class="btn btn-success btn-xs btn-outline" onclick="changeUserStatus({{$account.Id}}, 1)">启用账号</button>
+                                        <button class="btn btn-success btn-xs btn-outline" onclick="changeUserStatus({{$account.Id}}, 1)">启用账号
+                                        </button>
                                     {{end}}
                                 </td>
                             </tr>

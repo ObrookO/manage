@@ -2,10 +2,7 @@ package initialization
 
 import (
 	"manage/models"
-
-	utils "github.com/ObrookO/go-utils"
-
-	"github.com/astaxie/beego"
+	"manage/tool"
 
 	"github.com/astaxie/beego/logs"
 )
@@ -19,9 +16,8 @@ const (
 // InitializeManager 初始化管理员
 func InitializeManager() {
 	if !models.IsManagerExists(nil) {
-		key := beego.AppConfig.String("aes_key")
 
-		encryptPass, _ := utils.AesEncrypt(ManagerPassword, key)
+		encryptPass := tool.GenerateEncryptedPassword(ManagerPassword)
 		if _, err := models.AddManager(models.Manager{
 			Username: ManagerName,
 			Nickname: ManagerNickname,

@@ -9,12 +9,14 @@
 
     <link rel="icon" type="image/png" href="/static/favicon.png">
 
-    {{.Style}}
-
     {{assets_css "/css/bootstrap.min.css"}}
     {{assets_css "/css/font-awesome.css"}}
     {{assets_css "/css/animate.css"}}
+    {{assets_css "/css/chosen.css"}}
     {{assets_css "/css/style.css"}}
+    {{assets_css "/css/datatables.min.css"}}
+
+    {{.Style}}
 
     <style>
         .require_label:before {
@@ -51,6 +53,10 @@
 {{assets_js "/js/jquery.slimscroll.min.js"}}
 {{assets_js "/js/inspinia.js"}}
 {{assets_js "/js/pace.min.js"}}
+{{assets_js "/js/wangEditor.min.js"}}
+{{assets_js "/js/chosen.jquery.js"}}
+{{assets_js "/js/sweetalert.js"}}
+{{assets_js "/js/datatables.min.js"}}
 
 <script>
     let GToken = $('input[name=_xsrf]').val();
@@ -73,6 +79,37 @@
             link.parents('li').addClass('active');
             link.parents('li').siblings('li').removeClass('active');
         }
+    }
+
+    /**
+     * ajax请求成功后的操作
+     * @param data
+     */
+    function ajaxRequestSuccess(data) {
+        if (data.code === 200) {
+            swal({
+                title: '操作成功',
+                icon: 'success'
+            }).then(function () {
+                window.location.reload();
+            });
+        } else {
+            swal({
+                title: data.msg,
+                icon: 'danger'
+            })
+        }
+    }
+
+    /**
+     * 显示错误信息
+     * @param msg
+     */
+    function showErrorMsg(msg) {
+        swal({
+            title: msg,
+            icon: 'danger'
+        })
     }
 </script>
 

@@ -1,0 +1,102 @@
+<script>
+    /**
+     * 添加用户
+     * @param obj
+     */
+    function addManager(obj) {
+        let modal = $(obj).parents('.modal'),
+            username = modal.find('#username').val(),
+            nickname = modal.find('#nickname').val(),
+            email = modal.find('#email').val(),
+            isAdmin = modal.find('[name=is_admin]:checked').val();
+
+        $.post('{{urlfor "ManagerController.Post"}}', {
+            _xsrf: GToken,
+            username: username,
+            nickname: nickname,
+            email: email,
+            isAdmin: isAdmin,
+        }, function (data) {
+            if (data.code === 200) {
+                window.location.reload();
+            } else {
+                modal.find('.error').text(data.msg);
+            }
+        }, 'json')
+    }
+
+    /**
+     * 显示编辑用户的模态框
+     * @param id
+     */
+    function showEditModal(id) {
+        $.post('{{urlfor "ManagerController.GetInfo"}}', {
+            _xsrf: GToken,
+            id: id
+        }, function (data) {
+            if (data.code === 200) {
+                let modal = $('#edit-modal'),
+                    info = data.data;
+
+                modal.find('input[name=id]').val(info.id);
+                modal.find('input[name=username]').val(info.username);
+                modal.find('input[name=nickname]').val(info.nickname);
+                modal.find('input[name=email]').val(info.email);
+                modal.find('[name=is_admin][value=' + info.is_admin + ']').attr('checked', true);
+
+                modal.modal();
+            } else {
+                showErrorMsg(data.msg)
+            }
+        }, 'json')
+    }
+
+    /**
+     * editManager 编辑用户
+     * @param obj
+     */
+    function editManager(obj) {
+        let modal = $(obj).parents('.modal'),
+            id = modal.find('input[name=id]').val(),
+            username = modal.find('input[name=username]').val(),
+            nickname = modal.find('input[name=nickname]').val(),
+            email = modal.find('input[name=email]').val(),
+            isAdmin = modal.find('[name=is_admin]:checked').val();
+
+        $.post('{{urlfor "ManagerController.Update"}}', {
+            _xsrf: GToken,
+            id: id,
+            username: username,
+            nickname: nickname,
+            email: email,
+            isAdmin: isAdmin
+        }, function (data) {
+            if (data.code === 200) {
+                window.location.reload();
+            } else {
+                modal.find('.error').text(data.msg);
+            }
+        }, 'json');
+    }
+
+    /**
+     *
+     * @param id
+     */
+    function deleteManager(id) {
+        swal({
+            title: '确定要删除吗？',
+            icon: 'warning',
+            buttons: ['取消', '确定']
+        }).then(function (opt) {
+            if (opt) {
+                $.post('{{urlfor "ManagerController.Delete"}}', {
+                    _xsrf: GToken,
+                    id: id
+                }, function (data) {
+                    ajaxRequestSuccess(data);
+                }, 'json')
+            }
+        })
+    }
+</script>

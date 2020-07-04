@@ -6,7 +6,6 @@
             </div>
             <div class="ibox-content">
                 <form action="{{urlfor "ArticleController.Update"}}" method="post" class="article_form form-horizontal">
-                    {{.xsrfdata}}
                     <input type="hidden" id="id" name="id" value="{{.id}}">
                     <input type="hidden" id="cover" name="cover" value="{{.article.Cover}}">
                     <div class="form-group">

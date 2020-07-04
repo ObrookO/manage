@@ -16,13 +16,13 @@ func (c *CategoryController) Get() {
 	c.Layout = "layouts/master.html"
 	c.TplName = "category/index.html"
 	c.LayoutSections = map[string]string{
-		"Style":  "category/style.html",
-		"Script": "category/script.html",
+		"Style":  "category/index_style.html",
+		"Script": "category/index_script.html",
 	}
 
-	AddLog(c.Ctx, "查看栏目列表", "", "PAGE", "SUCCESS")
+	AddLog(c.Ctx, "查看栏目列表", "", "PAGE")
 
-	categories, _ := models.GetCategories(nil)
+	categories, _ := models.GetAllCategories(nil)
 
 	c.Data["categories"] = categories
 }
@@ -30,17 +30,17 @@ func (c *CategoryController) Get() {
 // Post 添加栏目
 func (c *CategoryController) Post() {
 	name := c.GetString("name")
-	logContent := "添加栏目 " + name
+	logContent := "添加栏目，栏目名称：" + name
 
 	if len(name) == 0 || len([]rune(name)) > categoryNameMaxLength {
-		AddLog(c.Ctx, logContent, "名称的长度为0-10", "{\"code\": 400000, \"msg\": \"名称的长度为0-10\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "名称的长度为0-10"}
+		AddLog(c.Ctx, logContent, fmt.Sprintf("名称的长度为0-%v", categoryNameMaxLength), fmt.Sprintf("{\"code\": 400000, \"msg\": \"名称的长度为0-%v\"}", categoryNameMaxLength))
+		c.Data["json"] = &JSONResponse{Code: 400000, Msg: fmt.Sprintf("名称的长度为0-%v", categoryNameMaxLength)}
 		c.ServeJSON()
 		return
 	}
 
 	if models.IsCategoryExists(map[string]interface{}{"name": name}) {
-		AddLog(c.Ctx, logContent, "栏目已存在", "{\"code\": 400001, \"msg\": \"栏目已存在\"}", "FAIL")
+		AddLog(c.Ctx, logContent, "栏目已存在", "{\"code\": 400001, \"msg\": \"栏目已存在\"}")
 		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "栏目已存在"}
 		c.ServeJSON()
 		return
@@ -48,13 +48,13 @@ func (c *CategoryController) Post() {
 
 	categoryId, err := models.AddCategory(models.Category{Name: name})
 	if err != nil {
-		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400002, \"msg\": \"栏目添加失败\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "栏目添加失败"}
+		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400002, \"msg\": \"操作失败\"}")
+		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "操作失败"}
 		c.ServeJSON()
 		return
 	}
 
-	AddLog(c.Ctx, logContent, "", fmt.Sprintf("{\"code\": 200, \"msg\": \"OK\", \"data\": %v }", categoryId), "SUCCESS")
+	AddLog(c.Ctx, logContent, "", fmt.Sprintf("{\"code\": 200, \"msg\": \"OK\", \"data\": %v }", categoryId))
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK", Data: categoryId}
 	c.ServeJSON()
 }
@@ -63,29 +63,30 @@ func (c *CategoryController) Post() {
 func (c *CategoryController) DeleteCategory() {
 	id, _ := c.GetInt("id")
 	category, _ := models.GetCategory(map[string]interface{}{"id": id})
-	logContent := "删除栏目 " + category.Name
+
+	logContent := "删除栏目，栏目名称：" + category.Name
 	if category.Id == 0 {
-		AddLog(c.Ctx, logContent, "", "{\"code\": 400000, \"msg\": \"栏目不存在\"}", "FAIL")
+		AddLog(c.Ctx, logContent, "", "{\"code\": 400000, \"msg\": \"栏目不存在\"}")
 		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "栏目不存在"}
 		c.ServeJSON()
 		return
 	}
 
-	if category.ArticleNum != 0 {
-		AddLog(c.Ctx, logContent, "", "{\"code\": 400001, \"msg\": \"栏目下有文章，不能删除\"}", "FAIL")
+	if models.GetArticleNumOfCategory(map[string]interface{}{"category_id": category.Id}) != 0 {
+		AddLog(c.Ctx, logContent, "", "{\"code\": 400001, \"msg\": \"栏目下有文章，不能删除\"}")
 		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "栏目下有文章，不能删除"}
 		c.ServeJSON()
 		return
 	}
 
 	if _, err := models.DeleteCategory(map[string]interface{}{"id": id}); err != nil {
-		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400002, \"msg\": \"栏目删除失败\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "栏目删除失败"}
+		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400002, \"msg\": \"操作失败\"}")
+		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "操作失败"}
 		c.ServeJSON()
 		return
 	}
 
-	AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
+	AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}")
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
 	c.ServeJSON()
 }
@@ -97,15 +98,15 @@ func (c *CategoryController) UpdateCategory() {
 
 	category, _ := models.GetCategory(map[string]interface{}{"id": id})
 	if category.Id == 0 {
-		AddLog(c.Ctx, "修改栏目名称", "栏目不存在", "{\"code\": 400000, \"msg\": \"栏目不存在\"}", "FAIL")
+		AddLog(c.Ctx, "修改栏目名称", "栏目不存在", "{\"code\": 400000, \"msg\": \"栏目不存在\"}")
 		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "栏目不存在"}
 		c.ServeJSON()
 		return
 	}
 
-	logContent := "修改栏目 " + category.Name + " 的名称为 " + name
+	logContent := "修改栏目名称，原始名称：" + category.Name + "，新名称：" + name
 	if len(name) == 0 || len([]rune(name)) > categoryNameMaxLength {
-		AddLog(c.Ctx, logContent, "名称的长度为0-10", "{\"code\": 400000, \"msg\": \"名称的长度为0-10\"}", "FAIL")
+		AddLog(c.Ctx, logContent, "名称的长度为0-10", "{\"code\": 400000, \"msg\": \"名称的长度为0-10\"}")
 		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "名称的长度为0-10"}
 		c.ServeJSON()
 		return
@@ -113,7 +114,7 @@ func (c *CategoryController) UpdateCategory() {
 
 	// 如果名字没有更改，直接返回
 	if name == category.Name {
-		AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
+		AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}")
 		c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
 		c.ServeJSON()
 		return
@@ -121,7 +122,7 @@ func (c *CategoryController) UpdateCategory() {
 
 	// 判断是否存在重名栏目
 	if models.IsCategoryExists(map[string]interface{}{"name": name}) {
-		AddLog(c.Ctx, logContent, "栏目已存在", "{\"code\": 400002, \"msg\": \"栏目已存在\"}", "FAIL")
+		AddLog(c.Ctx, logContent, "栏目已存在", "{\"code\": 400002, \"msg\": \"栏目已存在\"}")
 		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "栏目已存在"}
 		c.ServeJSON()
 		return
@@ -131,13 +132,13 @@ func (c *CategoryController) UpdateCategory() {
 		"name":       name,
 		"updated_at": time.Now().Format("2006-01-02 15:04:05"),
 	}); err != nil {
-		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400003, \"msg\": \"栏目编辑失败\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400003, Msg: "栏目编辑失败"}
+		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400003, \"msg\": \"操作失败\"}")
+		c.Data["json"] = &JSONResponse{Code: 400003, Msg: "操作失败"}
 		c.ServeJSON()
 		return
 	}
 
-	AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
+	AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}")
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
 	c.ServeJSON()
 }

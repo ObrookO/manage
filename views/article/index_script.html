@@ -1,6 +1,29 @@
-{{assets_js "/js/sweetalert.js"}}
-
 <script>
+    $(function () {
+        // select框
+        let config = {
+            '.chosen-select': {width: "100%"},
+            '.chosen-select-deselect': {allow_single_deselect: true},
+            '.chosen-select-no-single': {disable_search_threshold: 10},
+            '.chosen-select-no-results': {no_results_text: 'Oops, nothing found!'},
+            '.chosen-select-width': {width: "95%"}
+        };
+        for (var selector in config) {
+            $(selector).chosen(config[selector]);
+        }
+
+        $('.article-table').DataTable({
+            searching: false,
+            ordering: false,
+            info: false,
+            lengthChange: false,
+            pageLength: 20,
+            language: {
+                emptyTable: '暂无数据'
+            }
+        });
+    });
+
     /**
      * 查询文章
      */
@@ -23,7 +46,7 @@
      */
     function changeStatus(id, status) {
         swal({
-            title: '确定要执行该操作吗？',
+            title: '确定要执行此操作吗？',
             buttons: ['取消', '确定'],
             icon: 'warning'
         }).then(function (opt) {
@@ -33,19 +56,7 @@
                     id: id,
                     status: status
                 }, function (data) {
-                    if (data.code === 200) {
-                        swal({
-                            title: '操作成功',
-                            icon: 'success'
-                        }).then(function () {
-                            window.location.reload();
-                        })
-                    } else {
-                        swal({
-                            title: data.msg,
-                            icon: 'danger'
-                        })
-                    }
+                    ajaxRequestSuccess(data);
                 }, 'json')
             }
         })
@@ -66,19 +77,7 @@
                     _xsrf: GToken,
                     id: id,
                 }, function (data) {
-                    if (data.code === 200) {
-                        swal({
-                            title: '操作成功',
-                            icon: 'success'
-                        }).then(function () {
-                            window.location.reload();
-                        })
-                    } else {
-                        swal({
-                            title: data.msg,
-                            icon: 'danger'
-                        })
-                    }
+                    ajaxRequestSuccess(data);
                 }, 'json');
             }
         })

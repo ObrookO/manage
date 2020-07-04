@@ -10,11 +10,11 @@ func AddCategory(data Category) (int64, error) {
 	return o.Insert(&data)
 }
 
-// GetCategories 获取所有的栏目
-func GetCategories(filter map[string]interface{}) ([]*Category, error) {
+// GetAllCategories 获取所有的栏目
+func GetAllCategories(filter map[string]interface{}) ([]*Category, error) {
 	var categories []*Category
 
-	_, err := concatFilter("category", filter).All(&categories)
+	_, err := concatFilter("category", filter).RelatedSel().All(&categories)
 	return categories, err
 }
 

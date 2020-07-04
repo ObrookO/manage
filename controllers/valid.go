@@ -16,8 +16,12 @@ func validData(data interface{}) error {
 	var err error
 
 	switch reflect.TypeOf(data).String() {
-	case "*models.Article":
-		b, err = v.Valid(data.(*models.Article))
+	case "models.Article":
+		b, err = v.Valid(data.(models.Article))
+
+	case "models.Manager":
+		b, err = v.Valid(data.(models.Manager))
+
 	default:
 		return errors.New("unrecognized type of data")
 	}

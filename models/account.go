@@ -5,8 +5,8 @@ func AddAccount(data *Account) (int64, error) {
 	return o.Insert(data)
 }
 
-// UpdateAccount 更新账号信息
-func UpdateAccount(filter, values map[string]interface{}) (int64, error) {
+// UpdateAccountWithFilter 更新账号信息
+func UpdateAccountWithFilter(filter, values map[string]interface{}) (int64, error) {
 	return concatFilter("account", filter).Update(values)
 }
 

@@ -27,7 +27,7 @@ type Account struct {
 // AdminLog 后台日志
 type AdminLog struct {
 	Id        int
-	ManagerId int       // 管理员id
+	Manager   *Manager  `orm:"rel(one)"` // 管理员
 	Content   string    // 操作
 	Ip        string    // 客户端IP
 	Url       string    // 请求地址
@@ -71,11 +71,10 @@ type ArticleTag struct {
 
 // Category 栏目
 type Category struct {
-	Id         int
-	Name       string
-	ArticleNum int
-	CreatedAt  time.Time `orm:"auto_now_add;type(timestamp)"`
-	UpdatedAt  time.Time `orm:"auto_now;type(timestamp)"`
+	Id        int
+	Name      string
+	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)"`
+	UpdatedAt time.Time `orm:"auto_now;type(timestamp)"`
 }
 
 // Comment 评论
@@ -118,36 +117,23 @@ type HomeLog struct {
 
 // Manager 管理员
 type Manager struct {
-	Id        int
-	Username  string
-	Nickname  string
-	Email     string
-	Password  string
-	Avatar    string
-	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)"`
-	UpdatedAt time.Time `orm:"auto_now;type(timestamp)"`
-}
-
-// Permission 权限
-type Permission struct {
-	Id int
-}
-
-// Role 角色
-type Role struct {
-	Id        int
-	Name      string
-	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)"`
-	UpdatedAt time.Time `orm:"auto_now;type(timestamp)"`
+	Id        int       `json:"id"`
+	Username  string    `form:"username" valid:"Required" json:"username"`
+	Nickname  string    `form:"nickname" valid:"Required" json:"nickname"`
+	Email     string    `form:"email" valid:"Required;Email" json:"email"`
+	Password  string    `json:"-"`
+	Avatar    string    `json:"-"`
+	IsAdmin   int8      `form:"isAdmin" valid:"Required;Match(0|1)" json:"is_admin"`
+	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)" json:"-"`
+	UpdatedAt time.Time `orm:"auto_now;type(timestamp)" json:"-"`
 }
 
 // Tag 标签
 type Tag struct {
-	Id         int
-	Name       string
-	ArticleNum int
-	CreatedAt  time.Time `orm:"auto_now_add;type(timestamp)"`
-	UpdatedAt  time.Time `orm:"auto_now;type(timestamp)"`
+	Id        int
+	Name      string
+	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)"`
+	UpdatedAt time.Time `orm:"auto_now;type(timestamp)"`
 }
 
 // ArticleArchive 文章归档
@@ -157,10 +143,21 @@ type ArticleArchive struct {
 	Sum   int
 }
 
+type EmailLog struct {
+	Id        int
+	EmailType int
+	Address   string
+	Content   string
+	Result    string
+	Reason    string
+	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)"`
+	UpdatedAt time.Time `orm:"auto_now;type(timestamp)"`
+}
+
 func init() {
 	// dev开启调试模式
 	if beego.BConfig.RunMode == "dev" {
-		//orm.Debug = true
+		orm.Debug = true
 	}
 
 	host := beego.AppConfig.String("db_host")
@@ -174,6 +171,7 @@ func init() {
 	orm.RegisterDataBase("default", "mysql", user+":"+pass+"@tcp("+host+")/"+db+"?charset=utf8&loc=Asia%2FShanghai")
 	// 注册模型
 	orm.RegisterModel(
+		new(Manager),
 		new(Account),
 		new(AdminLog),
 		new(Article),
@@ -182,10 +180,8 @@ func init() {
 		new(Comment),
 		new(FavorRecord),
 		new(HomeLog),
-		new(Manager),
-		new(Permission),
-		new(Role),
 		new(Tag),
+		new(EmailLog),
 	)
 
 	o = orm.NewOrm()

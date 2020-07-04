@@ -1,0 +1,109 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title"></div>
+            <div class="ibox-content">
+                <div class="row">
+                    <div class="col-lg-12 form-horizontal">
+                        <div class="form-group">
+                            <label for="" class="col-lg-1 control-label">邮件类型</label>
+                            <div class="col-lg-4">
+                                <select name="" id="email-type" class="form-control">
+                                    <option value="-1">不限</option>
+                                    {{range $index, $et := .emailType}}
+                                        <option value="{{$index}}" {{if eq $.et $index}} selected {{end}}>{{$et}}</option>
+                                    {{end}}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-lg-1 control-label">发送结果</label>
+                            <div class="col-lg-4">
+                                <select name="" id="result" class="form-control">
+                                    <option value="" {{if eq .result ""}} selected {{end}}>不限</option>
+                                    <option value="SUCCESS" {{if eq .result "SUCCESS"}} selected {{end}}>SUCCESS</option>
+                                    <option value="FAIL" {{if eq .result "FAIL"}} selected {{end}}>FAIL</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-lg-1 control-label">收件人邮箱</label>
+                            <div class="col-lg-8">
+                                <input type="text" id="keyword" class="form-control" value="{{.keyword}}" placeholder="请输入收件人邮箱">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-lg-1 control-label"></label>
+                            <div class="col-lg-4">
+                                <button class="btn btn-primary btn-sm" onclick="searchAdminLog()">查询</button>
+                                <a class="btn btn-default btn-sm" href="{{urlfor "LogController.AdminLog"}}">重置</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="table-responsive">
+                    <table class="table email-log-table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>邮件类型</th>
+                            <th>收件人</th>
+                            <th class="content">内容</th>
+                            <th>结果</th>
+                            <th>失败原因</th>
+                            <th>发送时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{range $index, $log := .logs}}
+                            <tr>
+                                <td>{{add $index 1}}</td>
+                                <td>{{map_get $.emailType $log.EmailType}}</td>
+                                <td>{{$log.Address}}</td>
+                                <td class="content">{{$log.Content}}</td>
+                                <td>
+                                    {{if eq $log.Result "SUCCESS"}}
+                                        <label for="" class="label label-primary">{{$log.Result}}</label>
+                                    {{else}}
+                                        <label for="" class="label label-danger">{{$log.Result}}</label>
+                                    {{end}}
+                                </td>
+                                <td>{{$log.Reason}}</td>
+                                <td>{{dateformat $log.CreatedAt "2006-01-02 15:04:05"}}</td>
+                                <td>
+                                    <button class="btn btn-info btn-xs btn-outline" onclick="showDetail(this)">查看邮件内容</button>
+                                </td>
+                            </tr>
+                        {{end}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{/* 操作详情的模态框 */}}
+<div class="modal inmodal" id="detail-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated flipInY">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">邮件内容</h4>
+            </div>
+            <div class="modal-body form-horizontal">
+                <div class="form-group">
+                    <div class="col-lg-1"></div>
+                    <div class="col-lg-10">
+                        <p class="content"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>

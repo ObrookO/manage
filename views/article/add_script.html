@@ -1,4 +1,3 @@
-{{assets_js "/js/wangEditor.min.js"}}
 <script>
     let E = window.wangEditor,
         filename = 'file',
@@ -94,10 +93,10 @@
                 isDraft: is_draft,
             },
             success: function (data) {
-                if (data.code !== 200) {
-                    form.find('.error').text(data.msg);
-                } else {
+                if (data.code === 200) {
                     window.location.href = '{{urlfor "ArticleController.Get"}}';
+                } else {
+                    form.find('.error').text(data.msg);
                 }
             },
             error: function () {
@@ -155,16 +154,16 @@
                 dataType: 'json',
                 data: fd,
                 success: function (data) {
-                    if (data.code !== 200) {
-                        alert(data.msg);
-                    } else {
+                    if (data.code === 200) {
                         $('#cover').val(data.data);
                         $('.cover_preview').attr('src', '/uploads/' + data.data);
                         $('.cover_preview_div').show();
+                    } else {
+                        showErrorMsg(data.msg);
                     }
                 },
                 error: function () {
-                    alert('系统错误，请联系管理员');
+                    showErrorMsg('系统错误，请联系管理员');
                 },
                 processData: false,
                 contentType: false

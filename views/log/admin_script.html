@@ -1,19 +1,37 @@
 <script>
     $(function () {
-        $('#keyword').on('keyup', function (e) {
-            if (e.keyCode === 13) {
-                search();
+        // select框
+        let config = {
+            '.chosen-select': {width: "100%"},
+            '.chosen-select-deselect': {allow_single_deselect: true},
+            '.chosen-select-no-single': {disable_search_threshold: 10},
+            '.chosen-select-no-results': {no_results_text: 'Oops, nothing found!'},
+            '.chosen-select-width': {width: "95%"}
+        };
+        for (var selector in config) {
+            $(selector).chosen(config[selector]);
+        }
+
+        $('.admin-log-table').DataTable({
+            searching: false,
+            ordering: false,
+            info: false,
+            lengthChange: false,
+            pageLength: 20,
+            language: {
+                emptyTable: '暂无数据'
             }
-        })
+        });
     });
 
     // 搜索功能
-    function search() {
+    function searchAdminLog() {
         let method = $('#method option:selected').val(),
             result = $('#result option:selected').val(),
+            manager = $('#manager').val(),
             keyword = $('#keyword').val();
 
-        window.location.href = '{{urlfor "LogController.Get"}}' + '?m=' + method + '&r=' + result + '&key=' + keyword;
+        window.location.href = '{{urlfor "LogController.Get"}}' + '?m=' + method + '&r=' + result + '&o=' + manager + '&key=' + keyword;
     }
 
     // 显示详情

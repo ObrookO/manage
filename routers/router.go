@@ -10,7 +10,7 @@ func init() {
 
 	// 首页
 	beego.Router("/", &controllers.IndexController{}, "get:Get")
-	// 用户管理
+	// 账号管理
 	uns := beego.NewNamespace("/accounts",
 		beego.NSRouter("/", &controllers.AccountController{}),
 		beego.NSRouter("/commentstatus", &controllers.AccountController{}, "post:ChangeCommentStatus"),
@@ -40,23 +40,25 @@ func init() {
 	)
 	// 点赞记录
 	fns := beego.NewNamespace("/favors",
-		beego.NSRouter("/", &controllers.FavorRecordController{}),
+		beego.NSRouter("/", &controllers.FavorRecordController{}, "get:Get"),
 	)
 	// 评论管理
 	cns2 := beego.NewNamespace("/comments",
-		beego.NSRouter("/", &controllers.CommentController{}),
-		beego.NSRouter("/keyword", &controllers.CommentController{}, "get:Keyword"),
+		beego.NSRouter("/", &controllers.CommentController{}, "get:Get"),
+		beego.NSRouter("/delete", &controllers.CommentController{}, "post:Delete"),
 	)
 	// 日志管理
 	lns := beego.NewNamespace("/logs",
+		beego.NSRouter("/email", &controllers.LogController{}, "get:EmailLog"),
 		beego.NSRouter("/home", &controllers.LogController{}, "get:HomeLog"),
 		beego.NSRouter("/admin", &controllers.LogController{}, "get:AdminLog"),
 	)
-	// 系统管理
-	sns := beego.NewNamespace("/system",
-		beego.NSRouter("/managers", &controllers.ManagerController{}),
-		beego.NSRouter("/roles", &controllers.RoleController{}),
-		beego.NSRouter("/permissions", &controllers.PermissionController{}),
+	// 用户管理
+	sns := beego.NewNamespace("/managers",
+		beego.NSRouter("/", &controllers.ManagerController{}, "get:Get;post:Post"),
+		beego.NSRouter("/info", &controllers.ManagerController{}, "post:GetInfo"),
+		beego.NSRouter("/update", &controllers.ManagerController{}, "post:Update"),
+		beego.NSRouter("/delete", &controllers.ManagerController{}, "post:Delete"),
 	)
 	// 登录、退出等
 	ans2 := beego.NewNamespace("/auth",

@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"html/template"
 	"manage/models"
 
@@ -42,11 +41,11 @@ func (c *AuthController) DoLogin() {
 	username := c.GetString("username")
 	password := c.GetString("password")
 
-	logContent := "管理员 " + username + " 登录后台"
+	logContent := "管理员登录后台，用户名：" + username
 
 	if captcha == "" {
-		AddLog(c.Ctx, logContent, "请输入验证码", "{\"code\": 400002, \"msg\": \"验证码错误\"}", "FAIL")
-		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "验证码错误"}
+		AddLog(c.Ctx, logContent, "请输入验证码", "{\"code\": 400002, \"msg\": \"请输入验证码\"}")
+		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "请输入验证码"}
 		c.ServeJSON()
 		return
 	}
@@ -54,7 +53,7 @@ func (c *AuthController) DoLogin() {
 	// 校验验证码
 	if captchaId == "" {
 		if captcha != "08929" {
-			AddLog(c.Ctx, logContent, "验证码错误", "{\"code\": 400003, \"msg\": \"验证码错误\"}", "FAIL")
+			AddLog(c.Ctx, logContent, "验证码错误", "{\"code\": 400003, \"msg\": \"验证码错误\"}")
 			c.Data["json"] = &JSONResponse{Code: 400003, Msg: "验证码错误"}
 			c.ServeJSON()
 			return
@@ -62,7 +61,7 @@ func (c *AuthController) DoLogin() {
 	} else {
 		ca := base64Captcha.NewCaptcha(base64Captcha.DefaultDriverDigit, base64Captcha.DefaultMemStore)
 		if !ca.Verify(captchaId, captcha, true) {
-			AddLog(c.Ctx, logContent, "验证码错误", "{\"code\": 400004, \"msg\": \"验证码错误\"}", "FAIL")
+			AddLog(c.Ctx, logContent, "验证码错误", "{\"code\": 400004, \"msg\": \"验证码错误\"}")
 			c.Data["json"] = &JSONResponse{Code: 400004, Msg: "验证码错误"}
 			c.ServeJSON()
 			return
@@ -79,21 +78,16 @@ func (c *AuthController) DoLogin() {
 
 	manager, _ := models.GetOneManager(filter)
 	if manager.Id == 0 {
-		AddLog(c.Ctx, logContent, "用户名或密码错误", "{\"code\": 400005, \"msg\": \"用户名或密码错误\"}", "FAIL")
+		AddLog(c.Ctx, logContent, "用户名或密码错误", "{\"code\": 400005, \"msg\": \"用户名或密码错误\"}")
 		c.Data["json"] = &JSONResponse{Code: 400005, Msg: "用户名或密码错误"}
 		c.ServeJSON()
 		return
 	}
 
 	c.SetSession("isLogin", true)
-	c.SetSession("manager", map[string]interface{}{
-		"uid":      manager.Id,
-		"username": manager.Username,
-		"nickname": manager.Nickname,
-		"avatar":   manager.Avatar,
-	})
+	c.SetSession("manager", &manager)
 
-	AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
+	AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}")
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
 	c.ServeJSON()
 }
@@ -102,7 +96,7 @@ func (c *AuthController) DoLogin() {
 func (c *AuthController) Logout() {
 	c.EnableRender = false
 
-	AddLog(c.Ctx, fmt.Sprintf("管理员 %s 退出登录", ManagerInfo["username"]), "", "{\"code\": 200, \"msg\": \"OK\"}", "SUCCESS")
+	AddLog(c.Ctx, "管理员退出后台，用户名："+ManagerInfo.Username, "", "{\"code\": 200, \"msg\": \"OK\"}")
 
 	c.DelSession("isLogin")
 	c.DelSession("manager")

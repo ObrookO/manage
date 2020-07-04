@@ -1,16 +1,27 @@
-{{assets_js "/js/chosen.jquery.js"}}
-
 <script>
-    let config = {
-        '.chosen-select': {width: "100%"},
-        '.chosen-select-deselect': {allow_single_deselect: true},
-        '.chosen-select-no-single': {disable_search_threshold: 10},
-        '.chosen-select-no-results': {no_results_text: 'Oops, nothing found!'},
-        '.chosen-select-width': {width: "95%"}
-    };
-    for (var selector in config) {
-        $(selector).chosen(config[selector]);
-    }
+    $(function () {
+        let config = {
+            '.chosen-select': {width: "100%"},
+            '.chosen-select-deselect': {allow_single_deselect: true},
+            '.chosen-select-no-single': {disable_search_threshold: 10},
+            '.chosen-select-no-results': {no_results_text: 'Oops, nothing found!'},
+            '.chosen-select-width': {width: "95%"}
+        };
+        for (var selector in config) {
+            $(selector).chosen(config[selector]);
+        }
+
+        $('.comment-table').DataTable({
+            searching: false,
+            ordering: false,
+            info: false,
+            lengthChange: false,
+            pageLength: 20,
+            language: {
+                emptyTable: '暂无数据'
+            }
+        });
+    });
 
     /**
      * 搜索评论
@@ -20,5 +31,26 @@
             account = $('#account').val();
 
         window.location.href = '{{urlfor "CommentController.Get"}}' + '?ar=' + article + '&ac=' + account;
+    }
+
+    /**
+     * 删除评论
+     * @param id
+     */
+    function deleteComment(id) {
+        swal({
+            title: '确定要删除吗？',
+            buttons: ['取消', '确定'],
+            icon: 'warning'
+        }).then(function (opt) {
+            if (opt) {
+                $.post('{{urlfor "CommentController.Delete"}}', {
+                    _xsrf: GToken,
+                    id: id,
+                }, function (data) {
+                    ajaxRequestSuccess(data);
+                }, 'json');
+            }
+        })
     }
 </script>

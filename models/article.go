@@ -6,9 +6,9 @@ func IsArticleExists(filter map[string]interface{}) bool {
 }
 
 // AddArticle 添加文章
-func AddArticle(article *Article) (int64, error) {
-	o.Insert(article)
-	m2m := o.QueryM2M(article, "Tags")
+func AddArticle(article Article) (int64, error) {
+	o.Insert(&article)
+	m2m := o.QueryM2M(&article, "Tags")
 	return m2m.Add(article.Tags)
 }
 
@@ -16,7 +16,7 @@ func AddArticle(article *Article) (int64, error) {
 func GetAllArticles(filter map[string]interface{}) ([]*Article, error) {
 	var articles []*Article
 
-	_, err := concatFilter("article", filter).OrderBy("-id").RelatedSel().All(&articles)
+	_, err := concatFilter("article", filter).OrderBy("-id").RelatedSel("category", "manager").All(&articles)
 	// 查询标签
 	for _, a := range articles {
 		o.LoadRelated(a, "Tags")
@@ -25,9 +25,10 @@ func GetAllArticles(filter map[string]interface{}) ([]*Article, error) {
 	return articles, err
 }
 
-// GetTotal 获取文章总数
-func GetTotal(filter map[string]interface{}) (int64, error) {
-	return concatFilter("article", filter).Count()
+// GetArticleNumOfCategory 获取文章总数
+func GetArticleNumOfCategory(filter map[string]interface{}) int64 {
+	num, _ := concatFilter("article", filter).Count()
+	return num
 }
 
 // 文章归档
@@ -71,8 +72,8 @@ func GetBeforeAndAfter(aid int) (int, int) {
 }
 
 // UpdateArticle 更新文章
-func UpdateArticle(article *Article, field ...string) (int64, error) {
-	o.Update(article, field...)
+func UpdateArticle(article Article, field ...string) (int64, error) {
+	o.Update(&article, field...)
 	m2m := o.QueryM2M(article, "Tags")
 
 	DeleteArticleTag(map[string]interface{}{"article": article.Id})

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"html/template"
 	"manage/models"
+	"strings"
 
 	"github.com/astaxie/beego/utils"
 
@@ -22,16 +23,12 @@ type JSONResponse struct {
 }
 
 var (
-	ManagerInfo = map[string]interface{}{} // 管理员信息
+	IsAdmin     bool            // 是否是超级管理员
+	ManagerInfo *models.Manager // 管理员信息
 )
 
 func (c *BaseController) Prepare() {
-	if !c.IsAjax() {
-		c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML()) // 定义全局xsrf
-	} else {
-		c.EnableRender = false // ajax请求不加载模板
-	}
-
+	// 不需要验证登录的路由
 	noCheckUrl := []string{
 		"GET" + beego.URLFor("AuthController.GetCaptcha"),
 		"GET" + beego.URLFor("AuthController.Login"),
@@ -45,9 +42,32 @@ func (c *BaseController) Prepare() {
 		l := c.GetSession("isLogin")
 		m := c.GetSession("manager")
 
+		// 判断是否登录
 		if l != nil && m != nil {
-			ManagerInfo = m.(map[string]interface{})
-			c.Data["username"] = ManagerInfo["username"]
+			ManagerInfo = m.(*models.Manager)
+			c.Data["nickname"] = ManagerInfo.Nickname
+			if ManagerInfo.IsAdmin == 1 {
+				IsAdmin = true
+			}
+
+			if !c.IsAjax() {
+				c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML()) // 定义全局xsrf
+				c.Data["isAdmin"] = IsAdmin                          // 定义是否是管理员
+			} else {
+				c.EnableRender = false // ajax请求不加载模板
+			}
+
+			// 判断权限
+			if !IsAdmin {
+				if strings.Contains(path, "/logs") || strings.Contains(path, "/accounts") || strings.Contains(path, "/managers") {
+					if c.IsAjax() {
+						c.Data["json"] = &JSONResponse{Code: 500, Msg: "非法访问"}
+						c.ServeJSON()
+					} else {
+						c.Abort("401")
+					}
+				}
+			}
 		} else {
 			c.Redirect(c.URLFor("AuthController.Login"), 302)
 		}
@@ -55,7 +75,7 @@ func (c *BaseController) Prepare() {
 }
 
 // 记录日志
-func AddLog(ctx *context.Context, content, reason, response, result string) {
+func AddLog(ctx *context.Context, content, reason, response string) {
 	// 请求头转json
 	h, _ := json.Marshal(ctx.Request.Header)
 
@@ -77,19 +97,25 @@ func AddLog(ctx *context.Context, content, reason, response, result string) {
 		body = string(b)
 	}
 
-	log := models.AdminLog{
-		ManagerId: 0,
-		Content:   content,
-		Ip:        ctx.Input.IP(),
-		Url:       path,
-		Method:    method,
-		Query:     ctx.Request.URL.RawQuery,
-		Headers:   string(h),
-		Body:      body,
-		Response:  response,
-		Result:    result,
-		Reason:    reason,
+	result := "SUCCESS"
+	if reason != "" {
+		result = "FAIL"
 	}
+
+	log := models.AdminLog{
+		Content:  content,
+		Ip:       ctx.Input.IP(),
+		Url:      path,
+		Method:   method,
+		Query:    ctx.Request.URL.RawQuery,
+		Headers:  string(h),
+		Body:     body,
+		Response: response,
+		Result:   result,
+		Reason:   reason,
+	}
+
+	log.Manager = ManagerInfo
 
 	models.AddAdminLog(log)
 }

@@ -9,9 +9,8 @@
                     <a href="javascript:;">
                         <span class="clear">
                             <span class="block m-t-xs">
-                                <strong class="font-bold">{{.username}}</strong>
+                                <strong class="font-bold">{{.nickname}}</strong>
                             </span>
-                            <span class="text-muted text-xs block">角色</span>
                         </span>
                     </a>
                 </div>
@@ -21,11 +20,13 @@
                     <i class="fa fa-home"></i> <span class="nav-label">首页</span>
                 </a>
             </li>
-            <li>
-                <a href="{{urlfor "AccountController.Get"}}">
-                    <i class="fa fa-users"></i> <span class="nav-label">账号管理</span>
-                </a>
-            </li>
+            {{if .isAdmin}}
+                <li>
+                    <a href="{{urlfor "AccountController.Get"}}">
+                        <i class="fa fa-users"></i> <span class="nav-label">账号管理</span>
+                    </a>
+                </li>
+            {{end}}
             <li>
                 <a href="{{urlfor "CategoryController.Get"}}">
                     <i class="fa fa-th-list"></i> <span class="nav-label">栏目管理</span>
@@ -47,34 +48,28 @@
                 </a>
             </li>
             <li>
-                <a href="javascript:;">
-                    <i class="fa fa-comments"></i> <span class="nav-label">评论管理</span> <span class="fa
-                    arrow"></span>
+                <a href="{{urlfor "CommentController.Get"}}">
+                    <i class="fa fa-comments"></i> <span class="nav-label">评论管理</span>
                 </a>
-                <ul class="nav nav-second-level">
-                    <li><a href="{{urlfor "CommentController.Get"}}">评论列表</a></li>
-                    <li><a href="{{urlfor "CommentController.Keyword"}}">过滤关键词</a></li>
-                </ul>
             </li>
-            <li>
-                <a href="javascript:;">
-                    <i class="fa fa-files-o"></i> <span class="nav-label">日志管理</span> <span class="fa
+            {{if .isAdmin}}
+                <li>
+                    <a href="{{urlfor "ManagerController.Get"}}">
+                        <i class="fa fa-users"></i> <span class="nav-label">用户管理</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:;">
+                        <i class="fa fa-files-o"></i> <span class="nav-label">日志管理</span> <span class="fa
                     arrow"></span>
-                </a>
-                <ul class="nav nav-second-level">
-                    <li><a href="{{urlfor "LogController.HomeLog"}}">前台日志</a></li>
-                    <li><a href="{{urlfor "LogController.AdminLog"}}">后台日志</a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="javascript:;"><i class="fa fa-gear"></i> <span class="nav-label">系统管理</span> <span class="fa
-                arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li><a href="{{urlfor "ManagerController.Get"}}">用户管理</a></li>
-                    <li><a href="{{urlfor "RoleController.Get"}}">角色管理</a></li>
-                    <li><a href="{{urlfor "PermissionController.Get"}}">权限管理</a></li>
-                </ul>
-            </li>
+                    </a>
+                    <ul class="nav nav-second-level">
+                        <li><a href="{{urlfor "LogController.EmailLog"}}">邮件日志</a></li>
+                        <li><a href="{{urlfor "LogController.HomeLog"}}">前台日志</a></li>
+                        <li><a href="{{urlfor "LogController.AdminLog"}}">后台日志</a></li>
+                    </ul>
+                </li>
+            {{end}}
         </ul>
     </div>
 </nav>

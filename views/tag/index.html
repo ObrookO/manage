@@ -8,9 +8,8 @@
                 </div>
             </div>
             <div class="ibox-content">
-                {{.xsrfdata}}
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover tag-table">
                         <thead>
                         <tr>
                             <th>#</th>
@@ -25,7 +24,7 @@
                             <tr>
                                 <td>{{add $index 1}}</td>
                                 <td class="tag-name">{{$tag.Name}}</td>
-                                <td>{{$tag.ArticleNum}}</td>
+                                <td>{{getArticleNumByTagId $tag.Id}}</td>
                                 <td>{{dateformat $tag.CreatedAt "2006-01-02 15:04:05"}}</td>
                                 <td>
                                     <button class="btn btn-primary btn-xs btn-outline" onclick="showEditModal(this, {{$tag.Id}})">编辑</button>

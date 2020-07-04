@@ -1,4 +1,17 @@
 <script>
+    $(function () {
+        $('.category-table').DataTable({
+            searching: false,
+            ordering: false,
+            info: false,
+            lengthChange: false,
+            pageLength: 20,
+            language: {
+                emptyTable: '暂无数据'
+            }
+        });
+    });
+
     // 添加栏目
     function addCategory(obj) {
         let modal = $(obj).parents('.modal'),
@@ -8,10 +21,10 @@
             _xsrf: GToken,
             name: name,
         }, function (data) {
-            if (data.code !== 200) {
-                modal.find('.error').text(data.msg)
-            } else {
+            if (data.code === 200) {
                 window.location.reload();
+            } else {
+                modal.find('.error').text(data.msg)
             }
         }, 'json')
     }
@@ -27,7 +40,6 @@
         modal.modal();
     }
 
-
     // 编辑栏目
     function editCategory(obj) {
         let modal = $(obj).parents('.modal'),
@@ -39,10 +51,10 @@
             id: id,
             name: name,
         }, function (data) {
-            if (data.code !== 200) {
-                modal.find('.error').text(data.msg);
-            } else {
+            if (data.code === 200) {
                 window.location.reload();
+            } else {
+                modal.find('.error').text(data.msg);
             }
         }, 'json')
     }
@@ -50,17 +62,19 @@
 
     // 删除栏目
     function deleteCategory(id) {
-        if (window.confirm('确定要删除吗？删除后无法恢复！！！')) {
-            $.post('{{urlfor "CategoryController.DeleteCategory"}}', {
-                _xsrf: GToken,
-                id: id
-            }, function (data) {
-                if (data.code !== 200) {
-                    alert(data.msg);
-                }
-
-                window.location.reload();
-            }, 'json')
-        }
+        swal({
+            title: '确定要删除吗？',
+            buttons: ['取消', '确定'],
+            icon: 'warning'
+        }).then(function (opt) {
+            if (opt) {
+                $.post('{{urlfor "CategoryController.DeleteCategory"}}', {
+                    _xsrf: GToken,
+                    id: id
+                }, function (data) {
+                    ajaxRequestSuccess(data);
+                }, 'json')
+            }
+        });
     }
 </script>
