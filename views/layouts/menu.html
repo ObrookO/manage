@@ -20,7 +20,7 @@
                     <i class="fa fa-home"></i> <span class="nav-label">首页</span>
                 </a>
             </li>
-            {{if .isAdmin}}
+            {{if eq .isAdmin 1}}
                 <li>
                     <a href="{{urlfor "AccountController.Get"}}">
                         <i class="fa fa-users"></i> <span class="nav-label">账号管理</span>
@@ -52,7 +52,7 @@
                     <i class="fa fa-comments"></i> <span class="nav-label">评论管理</span>
                 </a>
             </li>
-            {{if .isAdmin}}
+            {{if eq .isAdmin 1}}
                 <li>
                     <a href="{{urlfor "ManagerController.Get"}}">
                         <i class="fa fa-users"></i> <span class="nav-label">用户管理</span>

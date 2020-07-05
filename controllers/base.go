@@ -60,14 +60,12 @@ func (c *BaseController) Prepare() {
 		// 判断是否登录
 		if l != nil && m != nil {
 			ManagerInfo = m.(*models.Manager)
-			c.Data["nickname"] = ManagerInfo.Nickname
 			if ManagerInfo.IsAdmin == 1 {
 				IsAdmin = true
 			}
 
-			if !c.IsAjax() {
-				c.Data["isAdmin"] = IsAdmin // 定义是否是管理员
-			}
+			c.Data["nickname"] = ManagerInfo.Nickname // 定义昵称
+			c.Data["isAdmin"] = IsAdmin               // 定义是否是管理员
 
 			// 判断权限
 			if !IsAdmin {
