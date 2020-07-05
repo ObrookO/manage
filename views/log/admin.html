@@ -75,7 +75,7 @@
                         {{range $index, $log := .logs}}
                             <tr>
                                 <td>{{add $index 1}}</td>
-                                <td>{{$log.Manager.Nickname}}</td>
+                                <td>{{$log.Manager.Username}}</td>
                                 <td class="content">{{$log.Content}}</td>
                                 <td class="result">
                                     {{if eq $log.Result "SUCCESS"}}
