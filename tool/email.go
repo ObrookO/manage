@@ -8,11 +8,6 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-const (
-	newManager    = iota // 添加用户
-	resetPassword        // 重置密码
-)
-
 var appURL = beego.AppConfig.String("appurl")                                            // 博客首页地址
 var emailFooter = "登录地址：<a href=\"" + appURL + "\" target=\"_blank\">" + appURL + "</a>" // 邮件页脚
 
@@ -23,10 +18,23 @@ func SendNewManagerEmail(toAddress, account, rawPassword string) {
 	content := []string{
 		"登录账号：" + account,
 		"初始密码：" + rawPassword,
-		strings.Repeat("<br>", 3) + emailFooter,
+		strings.Repeat("<br>", 2) + emailFooter,
 	}
 
-	sendEmail(newManager, toAddress, subject, contentType, strings.Join(content, "<br>"))
+	sendEmail(models.NewManager, toAddress, subject, contentType, strings.Join(content, "<br>"))
+}
+
+// SendResetPasswordEmail 发送重置密码的邮件
+func SendResetPasswordEmail(toAddress, code string) {
+	subject := "验证码"
+	contentType := "text/html"
+	content := []string{
+		"您正在重置登录密码，若不是本人操作，请联系<a href=\"mailto:" + beego.AppConfig.String("manager_email") + "\">管理员</a>。",
+		"验证码：" + code,
+		strings.Repeat("<br>", 2) + emailFooter,
+	}
+
+	sendEmail(models.ResetPassword, toAddress, subject, contentType, strings.Join(content, "<br>"))
 }
 
 // sendEmail 发送邮件

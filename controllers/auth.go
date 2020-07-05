@@ -1,14 +1,22 @@
 package controllers
 
 import (
-	"html/template"
+	"fmt"
 	"manage/models"
+	"manage/tool"
+	"regexp"
+	"time"
 
 	utils "github.com/ObrookO/go-utils"
 
 	"github.com/astaxie/beego"
 
 	"github.com/mojocn/base64Captcha"
+)
+
+const (
+	CodeSuffix   = "_reset_password_code" // 验证码key的后缀
+	CodeDuration = 2 * time.Minute        // 验证码有效期
 )
 
 type AuthController struct {
@@ -31,7 +39,6 @@ func (c *AuthController) GetCaptcha() {
 // Login 登录页面
 func (c *AuthController) Login() {
 	c.TplName = "auth/login.html"
-	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 }
 
 // DoLogin 处理登录
@@ -94,12 +101,98 @@ func (c *AuthController) DoLogin() {
 
 // Logout 退出
 func (c *AuthController) Logout() {
-	c.EnableRender = false
-
 	AddLog(c.Ctx, "管理员退出后台，用户名："+ManagerInfo.Username, "", "{\"code\": 200, \"msg\": \"OK\"}")
 
 	c.DelSession("isLogin")
 	c.DelSession("manager")
 
 	c.Redirect(c.URLFor("AuthController.Login"), 302)
+}
+
+// ResetPassword 忘记密码
+func (c *AuthController) ShowResetPassword() {
+	c.TplName = "auth/reset.html"
+}
+
+// SendResetPasswordEmail 发送重置密码邮件
+func (c *AuthController) SendResetPasswordEmail() {
+	username := c.GetString("username")
+
+	manager, _ := models.GetOneManager(map[string]interface{}{"username": username})
+	if manager.Id == 0 {
+		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "用户不存在"}
+		c.ServeJSON()
+		return
+	}
+
+	// 生成验证码
+	rc, err := GetRedisCache()
+	if err != nil {
+		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "系统错误，请联系管理员"}
+		c.ServeJSON()
+		return
+	}
+
+	code := utils.RandomStr(8)
+	rc.Put(username+CodeSuffix, code, CodeDuration)
+
+	go tool.SendResetPasswordEmail(manager.Email, code)
+	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
+	c.ServeJSON()
+}
+
+// ResetPassword 重置密码
+func (c *AuthController) ResetPassword() {
+	username := c.GetString("username")
+	manager, _ := models.GetOneManager(map[string]interface{}{"username": username})
+
+	logContent := "重置密码，用户名：" + username
+	if manager.Id == 0 {
+		AddLog(c.Ctx, logContent, "用户不存在", "{\"code\": 400000, \"msg\": \"用户不存在\"}")
+		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "用户不存在"}
+		c.ServeJSON()
+		return
+	}
+
+	rc, err := GetRedisCache()
+	if err != nil {
+		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400001, \"msg\": \"系统错误\"}")
+		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "系统错误"}
+		c.ServeJSON()
+		return
+	}
+
+	code := c.GetString("code")
+	if code != fmt.Sprintf("%s", rc.Get(username+CodeSuffix)) {
+		AddLog(c.Ctx, logContent, "邮箱验证码错误", "{\"code\": 400002, \"msg\": \"邮箱验证码错误\"}")
+		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "邮箱验证码错误"}
+		c.ServeJSON()
+		return
+	}
+
+	// 校验密码
+	pattern := "^[0-9a-zA-Z]{8,16}$"
+	reg, _ := regexp.Compile(pattern)
+	password := c.GetString("password")
+	if !reg.MatchString(password) {
+		AddLog(c.Ctx, logContent, "密码由8-16位的大小写字母和数字组成", "{\"code\": 400003, \"msg\": \"密码由8-16位的大小写字母和数字组成\"}")
+		c.Data["json"] = &JSONResponse{Code: 400003, Msg: "密码由8-16位的大小写字母和数字组成"}
+		c.ServeJSON()
+		return
+	}
+
+	encrypted := tool.GenerateEncryptedPassword(password)
+	if _, err := models.UpdateManager(map[string]interface{}{"id": manager.Id}, map[string]interface{}{
+		"password":   encrypted,
+		"updated_at": time.Now().Format("2006-01-02 15:04:05"),
+	}); err != nil {
+		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400004, \"msg\": \"操作失败\"}")
+		c.Data["json"] = &JSONResponse{Code: 400004, Msg: "操作失败"}
+		c.ServeJSON()
+		return
+	}
+
+	AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}")
+	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
+	c.ServeJSON()
 }

@@ -65,6 +65,8 @@ func init() {
 		beego.NSRouter("/login", &controllers.AuthController{}, "get:Login;post:DoLogin"),
 		beego.NSRouter("/captcha", &controllers.AuthController{}, "get:GetCaptcha"),
 		beego.NSRouter("/logout", &controllers.AuthController{}, "get:Logout"),
+		beego.NSRouter("/reset", &controllers.AuthController{}, "get:ShowResetPassword;post:ResetPassword"),
+		beego.NSRouter("/reset/sendEmail", &controllers.AuthController{}, "post:SendResetPasswordEmail"),
 	)
 
 	beego.AddNamespace(uns, cns, tns, ans, fns, cns2, lns, sns, ans2)

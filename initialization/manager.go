@@ -22,6 +22,7 @@ func InitializeManager() {
 			Username: ManagerName,
 			Nickname: ManagerNickname,
 			Password: encryptPass,
+			IsAdmin:  1,
 		}); err != nil {
 			logs.Error("Initialize Manager Failed: %v", err)
 		}

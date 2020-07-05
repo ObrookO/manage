@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>勤劳的码农 | 登录</title>
+    <title>{{.appTitle}} | 登录</title>
 
     <link rel="icon" type="image/png" href="/static/favicon.png">
 
@@ -43,7 +43,7 @@
             {{.xsrfdata}}
             <input type="hidden" name="" id="captcha-id">
             <div class="form-group">
-                <input type="email" class="form-control" id="username" placeholder="用户名" required="">
+                <input type="text" class="form-control" id="username" placeholder="用户名" required="">
             </div>
             <div class="form-group">
                 <input type="password" class="form-control" id="password" placeholder="密码" required="">
@@ -56,7 +56,7 @@
                 <strong class="error"></strong>
             </div>
             <button type="button" class="btn btn-primary block full-width m-b" onclick="login(this)">登录</button>
-            <a href="javascript:;"><small>忘记密码？</small></a>
+            <a href="{{urlfor "AuthController.ShowResetPassword"}}"><small>忘记密码？</small></a>
         </form>
     </div>
 </div>

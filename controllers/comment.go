@@ -51,7 +51,7 @@ func (c *CommentController) Delete() {
 
 	comment, _ := models.GetOneComment(map[string]interface{}{"id": id})
 	if comment.Id == 0 {
-		AddLog(c.Ctx, "删除评论", "评论不存在", "{code: 400000, msg: \"评论不存在\"}")
+		AddLog(c.Ctx, "删除评论", "评论不存在", "{\"code\": 400000, \"msg\":\"评论不存在\"}")
 		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "评论不存在"}
 		c.ServeJSON()
 		return
@@ -63,7 +63,7 @@ func (c *CommentController) Delete() {
 	// 判断权限
 	if !IsAdmin {
 		if ManagerInfo.Id != comment.Article.Manager.Id {
-			AddLog(c.Ctx, logContent, "非法操作", "{code: 500, msg: \"非法操作\"}")
+			AddLog(c.Ctx, logContent, "非法操作", "{\"code\": 500, \"msg\":\"非法操作\"}")
 			c.Data["json"] = &JSONResponse{Code: 500, Msg: "非法操作"}
 			c.ServeJSON()
 			return
@@ -71,13 +71,13 @@ func (c *CommentController) Delete() {
 	}
 
 	if _, err := models.DeleteComment(map[string]interface{}{"id": id}); err != nil {
-		AddLog(c.Ctx, logContent, err.Error(), "{code: 400001, msg: \"操作失败\"}")
+		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400001, \"msg\":\"操作失败\"}")
 		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "操作失败"}
 		c.ServeJSON()
 		return
 	}
 
-	AddLog(c.Ctx, logContent, "", "{code: 200, msg: \"OK\"}")
+	AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\":\"OK\"}")
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
 	c.ServeJSON()
 }

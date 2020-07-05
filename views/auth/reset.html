@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{.appTitle}} | 重置密码</title>
+
+    <link rel="icon" type="image/png" href="/static/favicon.png">
+
+    {{assets_css "/css/bootstrap.min.css"}}
+    {{assets_css "/css/font-awesome.css"}}
+    {{assets_css "/css/animate.css"}}
+    {{assets_css "/css/style.css"}}
+
+    <style>
+        .require_label:before {
+            content: '* ';
+            color: red;
+        }
+
+        .alert-danger {
+            display: none;
+        }
+    </style>
+
+</head>
+<body class="gray-bg">
+<div class="text-center animated fadeInDown">
+    <div>
+        <div>
+            <h2>重置密码</h2>
+        </div>
+        <form class="form-horizontal">
+            {{.xsrfdata}}
+            <div class="form-group">
+                <label for="" class="control-label col-lg-4 require_label">用户名</label>
+                <div class="col-lg-3">
+                    <input type="text" class="form-control" id="username" placeholder="请填写用户名" required="">
+                </div>
+                <div class="col-lg-1">
+                    <button type="button" class="btn btn-success btn-sm" onclick="sendCode(this)">发送验证码</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="" class="control-label col-lg-4 require_label">验证码</label>
+                <div class="col-lg-4">
+                    <input type="text" class="form-control" id="code" placeholder="请填写验证码" required="">
+                    <p class="pull-left text-danger" style="margin-top: 5px;">
+                        注：验证码有效期为2分钟
+                    </p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="" class="control-label col-lg-4 require_label">新密码</label>
+                <div class="col-lg-4">
+                    <input type="password" class="form-control" id="password" placeholder="请填写新密码" required="">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-lg-4"></div>
+                <div class="alert alert-danger col-lg-4">
+                    <strong class="error"></strong>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-lg-12">
+                    <button type="button" class="btn btn-primary center-block btn-w-m" onclick="resetPassword(this)">确定</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{assets_js "/js/jquery-2.1.1.js"}}
+{{assets_js "/js/bootstrap.min.js"}}
+
+<script>
+    /**
+     * 发送邮箱验证码
+     * @param obj
+     * @returns {boolean}
+     */
+    function sendCode(obj) {
+        let form = $(obj).parents('form'),
+            username = form.find('#username').val(),
+            interval = 120;
+
+        if (username.length === 0) {
+            form.find('.error').text('请填写用户名');
+            form.find('.alert-danger').show();
+            return false;
+        }
+
+        // 隐藏错误提示
+        form.find('.alert-danger').hide();
+
+        // 倒计时
+        // let i = setInterval(function () {
+        //     if (interval > 0) {
+        //         let str = '重新发送(' + interval + ')';
+        //         interval--;
+        //
+        //         $(obj).attr('disabled', true);
+        //         $(obj).text(str);
+        //     } else {
+        //         clearInterval(i);
+        //         $(obj).attr('disabled', false);
+        //         $(obj).text('发送验证码');
+        //     }
+        // }, 1000);
+
+        $.post('{{urlfor "AuthController.SendResetPasswordEmail"}}', {
+            _xsrf: $('input[name=_xsrf]').val(),
+            username: username
+        }, function (data) {
+            if (data.code === 200) {
+                alert('邮件发送成功');
+            } else {
+                form.find('.error').text(data.msg);
+            }
+        }, 'json');
+    }
+
+    /**
+     * 重置密码
+     * @param obj
+     */
+    function resetPassword(obj) {
+        let form = $(obj).parents('form'),
+            username = form.find('#username').val(),
+            code = form.find('#code').val(),
+            password = form.find('#password').val();
+
+        $.post('{{urlfor "AuthController.ResetPassword"}}', {
+            _xsrf: $('input[name=_xsrf]').val(),
+            username: username,
+            code: code,
+            password: password,
+        }, function (data) {
+            if (data.code === 200) {
+                window.location.href = '{{urlfor "AuthController.Login"}}';
+            } else {
+                form.find('.error').text(data.msg);
+                form.find('.alert-danger').show();
+            }
+        }, 'json');
+    }
+</script>
+</body>
+</html>

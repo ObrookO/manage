@@ -6,9 +6,14 @@ import (
 	"manage/models"
 	"strings"
 
+	"github.com/astaxie/beego/logs"
+
+	"github.com/astaxie/beego/cache"
+
 	"github.com/astaxie/beego/utils"
 
 	"github.com/astaxie/beego"
+	_ "github.com/astaxie/beego/cache/redis"
 	"github.com/astaxie/beego/context"
 )
 
@@ -28,12 +33,22 @@ var (
 )
 
 func (c *BaseController) Prepare() {
+	if !c.IsAjax() {
+		c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())                    // 定义全局xsrf
+		c.Data["appTitle"] = beego.AppConfig.DefaultString("apptitle", "勤劳的码农") // 定义app title
+	} else {
+		c.EnableRender = false // ajax请求不加载模板
+	}
+
 	// 不需要验证登录的路由
 	noCheckUrl := []string{
-		"GET" + beego.URLFor("AuthController.GetCaptcha"),
-		"GET" + beego.URLFor("AuthController.Login"),
-		"POST" + beego.URLFor("AuthController.DoLogin"),
-		"GET" + beego.URLFor("AuthController.Logout"),
+		"GET" + beego.URLFor("AuthController.GetCaptcha"),              // 获取验证码
+		"GET" + beego.URLFor("AuthController.Login"),                   // 登录页面
+		"POST" + beego.URLFor("AuthController.DoLogin"),                // 登录逻辑
+		"GET" + beego.URLFor("AuthController.Logout"),                  // 退出
+		"GET" + beego.URLFor("AuthController.ShowResetPassword"),       // 重置密码页面
+		"POST" + beego.URLFor("AuthController.SendResetPasswordEmail"), // 发送重置邮件
+		"POST" + beego.URLFor("AuthController.ResetPassword"),          // 重置密码
 	}
 
 	method := c.Ctx.Request.Method
@@ -51,10 +66,7 @@ func (c *BaseController) Prepare() {
 			}
 
 			if !c.IsAjax() {
-				c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML()) // 定义全局xsrf
-				c.Data["isAdmin"] = IsAdmin                          // 定义是否是管理员
-			} else {
-				c.EnableRender = false // ajax请求不加载模板
+				c.Data["isAdmin"] = IsAdmin // 定义是否是管理员
 			}
 
 			// 判断权限
@@ -72,6 +84,17 @@ func (c *BaseController) Prepare() {
 			c.Redirect(c.URLFor("AuthController.Login"), 302)
 		}
 	}
+}
+
+// GetRedisCache 获取redis缓存实例
+func GetRedisCache() (cache.Cache, error) {
+	address := beego.AppConfig.String("redis_host")
+	c, err := cache.NewCache("redis", `{"key":"mn","conn":"`+address+`"}`)
+	if err != nil {
+		logs.Error("init redis cache failed, error: %v", err)
+	}
+
+	return c, err
 }
 
 // 记录日志
