@@ -123,7 +123,7 @@ type Manager struct {
 	Email     string    `form:"email" valid:"Required;Email" json:"email"`
 	Password  string    `json:"-"`
 	Avatar    string    `json:"-"`
-	IsAdmin   int8      `form:"isAdmin" valid:"Required;Match(0|1)" json:"is_admin"`
+	IsAdmin   int8      `form:"isAdmin" valid:"Match(0|1)" json:"is_admin"`
 	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)" json:"-"`
 	UpdatedAt time.Time `orm:"auto_now;type(timestamp)" json:"-"`
 }

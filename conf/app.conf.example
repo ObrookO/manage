@@ -5,7 +5,10 @@ runmode =
 appurl =
 apptitle =
 
-aes_key =
+#admin默认密码
+defaultpassword =
+#admin默认邮箱
+defaultemail =
 
 #xsrf相关
 enablexsrf =
@@ -18,12 +21,6 @@ sessionproviderconfig =
 sessionname =
 sessiongcmaxlifetime =
 
-#数据库相关
-db_host =
-db_name =
-db_user =
-db_password =
-
 #redis相关
 redis_host =
 redis_password =
@@ -35,3 +32,21 @@ email_from_name =
 email_from_address =
 email_password =
 manager_email =
+
+[dev]
+#aes相关
+aes_key =
+#数据库相关
+db_host =
+db_name =
+db_user =
+db_password =
+
+[prod]
+#aes相关
+aes_key =
+#数据库相关
+db_host =
+db_name =
+db_user =
+db_password =
