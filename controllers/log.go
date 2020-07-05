@@ -58,9 +58,7 @@ func (c *LogController) HomeLog() {
 	filter := map[string]interface{}{}
 	logs, _ := models.GetAllHomeLogs(filter)
 
-	c.Data = map[interface{}]interface{}{
-		"logs": logs,
-	}
+	c.Data["logs"] = logs
 }
 
 // AdminLog 后台日志列表

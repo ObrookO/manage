@@ -84,7 +84,7 @@
     function sendCode(obj) {
         let form = $(obj).parents('form'),
             username = form.find('#username').val(),
-            interval = 120;
+            interval = 60;
 
         if (username.length === 0) {
             form.find('.error').text('请填写用户名');
@@ -96,19 +96,19 @@
         form.find('.alert-danger').hide();
 
         // 倒计时
-        // let i = setInterval(function () {
-        //     if (interval > 0) {
-        //         let str = '重新发送(' + interval + ')';
-        //         interval--;
-        //
-        //         $(obj).attr('disabled', true);
-        //         $(obj).text(str);
-        //     } else {
-        //         clearInterval(i);
-        //         $(obj).attr('disabled', false);
-        //         $(obj).text('发送验证码');
-        //     }
-        // }, 1000);
+        let i = setInterval(function () {
+            if (interval > 0) {
+                let str = '重新发送(' + interval + ')';
+                interval--;
+
+                $(obj).attr('disabled', true);
+                $(obj).text(str);
+            } else {
+                clearInterval(i);
+                $(obj).attr('disabled', false);
+                $(obj).text('发送验证码');
+            }
+        }, 1000);
 
         $.post('{{urlfor "AuthController.SendResetPasswordEmail"}}', {
             _xsrf: $('input[name=_xsrf]').val(),
