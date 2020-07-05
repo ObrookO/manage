@@ -1,16 +1,42 @@
+// 系统相关
 appname =
 httpport =
 runmode =
+appurl =
+apptitle =
+
+aes_key =
+
+// xsrf相关
 enablexsrf =
 xsrfexpire =
+
+// session 相关
 sessionon =
 sessionprovider =
 sessionproviderconfig =
 sessionname =
+sessiongcmaxlifetime =
+
+// 数据库相关
 db_host =
 db_name =
 db_user =
 db_password =
+
+// redis相关
+redis_host =
+redis_password =
+
+// 邮件相关
+email_host =
+email_port =
+email_from_name =
+email_from_address =
+email_password =
+manager_email =
+
+// 管理相关
 EnableAdmin =
 AdminAddr =
 AdminPort =
