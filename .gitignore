@@ -2,6 +2,14 @@
 .idea/
 *.conf
 manage
+manage.tar.gz
+manage.tar.gz
+manage.tar.gz
+manage.tar.gz
+manage.tar.gz
+manage.tar.gz
+manage.tar.gz
+manage.tar.gz
 go.sum
 *.log
 *.exe
