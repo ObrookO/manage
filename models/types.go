@@ -51,15 +51,16 @@ type Article struct {
 	Tags         []*Tag    `form:"tags" valid:"Required" orm:"rel(m2m);rel_through(manage/models.ArticleTag)"` // 标签
 	Description  string    `form:"description" valid:"Required"`                                               // 描述
 	Cover        string    `form:"cover" valid:"Required"`                                                     // 封面地址
-	Content      string    `form:"content" valid:"Required"`                                                   // 内容
-	IsScroll     int8      `form:"isScroll" valid:"Match(0|1)"`                                                // 是否轮播
-	IsRecommend  int8      `form:"isRecommend" valid:"Match(0|1)"`                                             // 是否推荐
-	AllowComment int8      `form:"allowComment" valid:"Match(0|1)"`                                            // 是否允许评论
-	FavorNum     int       // 点赞数量
-	Manager      *Manager  `orm:"rel(one)"` // 管理员信息，即作者信息
-	Status       int8      // 状态
-	CreatedAt    time.Time `orm:"auto_now_add;type(timestamp)"` // 添加时间
-	UpdatedAt    time.Time `orm:"auto_now;type(timestamp)"`     // 修改时间
+	CoverUrl     string    // 封面地址
+	Content      string    `form:"content" valid:"Required"`        // 内容
+	IsScroll     int8      `form:"isScroll" valid:"Match(0|1)"`     // 是否轮播
+	IsRecommend  int8      `form:"isRecommend" valid:"Match(0|1)"`  // 是否推荐
+	AllowComment int8      `form:"allowComment" valid:"Match(0|1)"` // 是否允许评论
+	//FavorRecord  []*FavorRecord `orm:"rel(m2m)"`                                                                    // 点赞数量
+	Manager   *Manager  `orm:"rel(one)"` // 管理员信息，即作者信息
+	Status    int8      // 状态
+	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)"` // 添加时间
+	UpdatedAt time.Time `orm:"auto_now;type(timestamp)"`     // 修改时间
 }
 
 // ArticleTag 文章标签
@@ -134,13 +135,6 @@ type Tag struct {
 	Name      string
 	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)"`
 	UpdatedAt time.Time `orm:"auto_now;type(timestamp)"`
-}
-
-// ArticleArchive 文章归档
-type ArticleArchive struct {
-	Date  string
-	Value string
-	Sum   int
 }
 
 type EmailLog struct {

@@ -31,7 +31,9 @@
                                 <select name="" id="manager" class="form-control chosen-select">
                                     <option value="-1">不限</option>
                                     {{range $manager := .managers}}
-                                        <option value="{{$manager.Id}}" {{if eq $manager.Id $.managerId}} selected {{end}}>{{$manager.Nickname}}</option>
+                                        <option value="{{$manager.Id}}" {{if eq $manager.Id $.managerId}} selected {{end}}>
+                                            {{$manager.Username}}
+                                        </option>
                                     {{end}}
                                 </select>
                             </div>

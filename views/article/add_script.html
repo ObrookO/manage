@@ -15,7 +15,7 @@
     // 定义图片上传之后的插入功能
     editor.customConfig.uploadImgHooks = {
         customInsert: function (insertImg, result, editor) {
-            insertImg('/uploads/' + result.data);
+            insertImg(result.data);
         }
     };
 

@@ -31,14 +31,6 @@ func GetArticleNumOfCategory(filter map[string]interface{}) int64 {
 	return num
 }
 
-// 文章归档
-func Archive() []ArticleArchive {
-	var archive []ArticleArchive
-
-	o.Raw("select date_format(created_at, '%Y年%m月') as date, date_format(created_at, '%Y/%m') as value, count(*) as sum from article group by value").QueryRows(&archive)
-	return archive
-}
-
 // GetOneArticle 获取一篇文章
 func GetOneArticle(filter map[string]interface{}) (Article, error) {
 	var article Article
@@ -74,7 +66,7 @@ func GetBeforeAndAfter(aid int) (int, int) {
 // UpdateArticle 更新文章
 func UpdateArticle(article Article, field ...string) (int64, error) {
 	o.Update(&article, field...)
-	m2m := o.QueryM2M(article, "Tags")
+	m2m := o.QueryM2M(&article, "Tags")
 
 	DeleteArticleTag(map[string]interface{}{"article": article.Id})
 	return m2m.Add(article.Tags)

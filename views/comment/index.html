@@ -13,7 +13,9 @@
                                 <select class="chosen-select" name="" id="article">
                                     <option value="-1">不限</option>
                                     {{range $article := .articles}}
-                                        <option value="{{$article.Id}}" {{if eq $article.Id $.ar}} selected {{end}}>{{$article.Title}} - {{$article.Manager.Nickname}}</option>
+                                        <option value="{{$article.Id}}" {{if eq $article.Id $.ar}} selected {{end}}>
+                                            {{$article.Title}} - {{$article.Manager.Username}}
+                                        </option>
                                     {{end}}
                                 </select>
                             </div>
@@ -61,7 +63,7 @@
                                 <td>{{$index | add 1}}</td>
                                 <td>{{$comment.Account.Username}}</td>
                                 <td>{{$comment.Article.Title}}</td>
-                                <td>{{$comment.Article.Manager.Nickname}}</td>
+                                <td>{{$comment.Article.Manager.Username}}</td>
                                 <td>{{$comment.OriginalContent}}</td>
                                 <td>
                                     <label for="" class="label label-info">{{$comment.ShowContent}}</label>

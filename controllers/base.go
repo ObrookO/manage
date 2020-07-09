@@ -28,7 +28,6 @@ type JSONResponse struct {
 }
 
 var (
-	IsAdmin     = false         // 是否是超级管理员
 	ManagerInfo *models.Manager // 管理员信息
 )
 
@@ -60,15 +59,12 @@ func (c *BaseController) Prepare() {
 		// 判断是否登录
 		if l != nil && m != nil {
 			ManagerInfo = m.(*models.Manager)
-			if ManagerInfo.IsAdmin == 1 {
-				IsAdmin = true
-			}
 
 			c.Data["nickname"] = ManagerInfo.Nickname // 定义昵称
-			c.Data["isAdmin"] = IsAdmin               // 定义是否是管理员
+			c.Data["isAdmin"] = ManagerInfo.IsAdmin   // 定义是否是管理员
 
 			// 判断权限
-			if !IsAdmin {
+			if ManagerInfo.IsAdmin != 1 {
 				if strings.Contains(path, "logs") || strings.Contains(path, "accounts") || strings.Contains(path, "managers") {
 					if c.IsAjax() {
 						c.Data["json"] = &JSONResponse{Code: 500, Msg: "非法访问"}

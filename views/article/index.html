@@ -108,7 +108,7 @@
                                     {{end}}
                                 </td>
                                 <td>
-                                    <a href="/uploads/{{$article.Cover}}" target="_blank">{{$article.Cover}}</a>
+                                    <a href="{{$article.CoverUrl}}" target="_blank">{{$article.Cover}}</a>
                                 </td>
                                 <td>
                                     {{if $article.IsScroll}}
@@ -131,7 +131,7 @@
                                         <label for="" class="label label-danger">不允许</label>
                                     {{end}}
                                 </td>
-                                <td>{{$article.Manager.Nickname}}</td>
+                                <td>{{$article.Manager.Username}}</td>
                                 <td>{{dateformat $article.UpdatedAt "2006-01-02 15:04:05"}}</td>
                                 <td>
                                     <a class="btn btn-primary btn-xs btn-outline" href="{{urlfor "ArticleController.Edit" ":id" $article.Id}}">编辑</a>

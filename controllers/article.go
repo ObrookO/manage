@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/astaxie/beego"
+
 	"github.com/astaxie/beego/utils"
 
 	utils2 "github.com/ObrookO/go-utils"
@@ -34,7 +36,7 @@ func (c *ArticleController) Get() {
 
 	// 查询条件
 	filter := map[string]interface{}{}
-	if !IsAdmin {
+	if ManagerInfo.IsAdmin != 1 {
 		filter["manager_id"] = ManagerInfo.Id
 	}
 
@@ -103,10 +105,10 @@ func (c *ArticleController) ChangeStatus() {
 		return
 	}
 
-	logContent := "修改文章状态为：" + statusMap[status] + "，文章作者：" + article.Manager.Nickname + "，文章标题：" + article.Title
+	logContent := "修改文章状态为：" + statusMap[status] + "，文章作者：" + article.Manager.Username + "，文章标题：" + article.Title
 
 	// 判断权限
-	if !IsAdmin {
+	if ManagerInfo.IsAdmin != 1 {
 		if ManagerInfo.Id != article.Manager.Id {
 			AddLog(c.Ctx, logContent, "非法操作", "{\"code\": 500, \"msg\": \"非法操作\"}")
 			c.Data["json"] = &JSONResponse{Code: 500, Msg: "非法操作"}
@@ -142,10 +144,10 @@ func (c *ArticleController) Delete() {
 		return
 	}
 
-	logContent := "删除文章，文章作者：" + article.Manager.Nickname + "，文章标题： " + article.Title
+	logContent := "删除文章，文章作者：" + article.Manager.Username + "，文章标题： " + article.Title
 
 	// 判断权限
-	if !IsAdmin {
+	if ManagerInfo.IsAdmin != 1 {
 		if ManagerInfo.Id != article.Manager.Id {
 			AddLog(c.Ctx, logContent, "非法操作", "{\"code\": 500, \"msg\": \"非法操作\"}")
 			c.Data["json"] = &JSONResponse{Code: 500, Msg: "非法操作"}
@@ -218,8 +220,13 @@ func (c *ArticleController) UploadImage() {
 		return
 	}
 
+	returnName := filename
+	if fileType == "content" {
+		returnName = getWholeUrl(filename)
+	}
+
 	AddLog(c.Ctx, logContent+"，保存名称："+filename, "", "{\"code\": 200, \"msg\":\"OK\"}")
-	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK", Data: filename}
+	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK", Data: returnName}
 	c.ServeJSON()
 }
 
@@ -305,6 +312,9 @@ func (c *ArticleController) Post() {
 		article.Status = 1
 	}
 
+	// 生成封面地址
+	article.CoverUrl = getWholeUrl(article.Cover)
+
 	// 管理员信息
 	article.Manager = &models.Manager{
 		Id: ManagerInfo.Id,
@@ -333,7 +343,12 @@ func (c *ArticleController) Edit() {
 	}
 
 	id, _ := c.GetInt(":id")
-	article, _ := models.GetOneArticle(map[string]interface{}{"id": id})
+	filter := map[string]interface{}{"id": id}
+	if ManagerInfo.IsAdmin != 1 {
+		filter["manager_id"] = ManagerInfo.Id
+	}
+
+	article, _ := models.GetOneArticle(filter)
 	if article.Id == 0 {
 		c.Abort("404")
 	}
@@ -357,18 +372,25 @@ func (c *ArticleController) Update() {
 		return
 	}
 
+	article.Manager = ManagerInfo
+
+	filter := map[string]interface{}{"id": article.Id}
+	if ManagerInfo.IsAdmin != 1 {
+		filter["manager_id"] = ManagerInfo.Id
+	}
+
 	// 判断文章是否存在
-	if !models.IsArticleExists(map[string]interface{}{"id": article.Id}) {
+	if !models.IsArticleExists(filter) {
 		AddLog(c.Ctx, "更新文章", "文章不存在", "{\"code\": 400001, \"msg\":\"文章不存在\"}")
 		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "文章不存在"}
 		c.ServeJSON()
 		return
 	}
 
-	logContent := "更新文章，文章作者：" + article.Manager.Nickname + "，文章标题：" + article.Title
+	logContent := "更新文章，文章作者：" + article.Manager.Username + "，文章标题：" + article.Title
 
 	// 判断权限
-	if !IsAdmin {
+	if ManagerInfo.IsAdmin != 1 {
 		if ManagerInfo.Id != article.Manager.Id {
 			AddLog(c.Ctx, logContent, "非法操作", "{\"code\": 500, \"msg\":\"非法操作\"}")
 			c.Data["json"] = &JSONResponse{Code: 500, Msg: "非法操作"}
@@ -426,7 +448,11 @@ func (c *ArticleController) Update() {
 		return
 	}
 
-	if _, err := models.UpdateArticle(article, "title", "keyword", "category_id", "description", "cover", "content", "is_scroll", "is_recommend",
+	// 生成封面地址
+	article.CoverUrl = getWholeUrl(article.Cover)
+
+	if _, err := models.UpdateArticle(article, "title", "keyword", "category_id", "description", "cover", "cover_url", "content", "is_scroll",
+		"is_recommend",
 		"allow_comment"); err != nil {
 		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400006, \"msg\":\"操作失败\"}")
 		c.Data["json"] = &JSONResponse{Code: 400006, Msg: "操作失败"}
@@ -438,4 +464,10 @@ func (c *ArticleController) Update() {
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
 	c.ServeJSON()
 	return
+}
+
+// 生成完整图片地址
+func getWholeUrl(image string) string {
+	imageURL := beego.AppConfig.String("image_url")
+	return imageURL + image
 }

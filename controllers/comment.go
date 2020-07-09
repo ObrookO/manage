@@ -19,7 +19,7 @@ func (c *CommentController) Get() {
 	AddLog(c.Ctx, "查看评论列表", "", "PAGE")
 
 	filter := map[string]interface{}{}
-	if !IsAdmin {
+	if ManagerInfo.IsAdmin != 1 {
 		filter["article__manager__id"] = ManagerInfo.Id
 	}
 
@@ -57,11 +57,12 @@ func (c *CommentController) Delete() {
 		return
 	}
 
-	logContent := "删除评论，文章作者：" + comment.Article.Manager.Nickname + "，文章标题：" + comment.Article.Title + "，评论账号：" + comment.Account.Username + "，评论内容：" + comment.
+	logContent := "删除评论，文章作者：" + comment.Article.Manager.Username + "，文章标题：" + comment.Article.Title + "，评论账号：" + comment.Account.
+		Username + "，评论内容：" + comment.
 		OriginalContent
 
 	// 判断权限
-	if !IsAdmin {
+	if ManagerInfo.IsAdmin != 1 {
 		if ManagerInfo.Id != comment.Article.Manager.Id {
 			AddLog(c.Ctx, logContent, "非法操作", "{\"code\": 500, \"msg\":\"非法操作\"}")
 			c.Data["json"] = &JSONResponse{Code: 500, Msg: "非法操作"}

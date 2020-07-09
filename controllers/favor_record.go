@@ -16,7 +16,12 @@ func (c *FavorRecordController) Get() {
 		"Script": "favor_record/index_script.html",
 	}
 
+	filter := map[string]interface{}{}
+	if ManagerInfo.IsAdmin != 1 {
+		filter["article__manager__id"] = ManagerInfo.Id
+	}
+
 	AddLog(c.Ctx, "查看点赞记录", "", "PAGE")
-	records, _ := models.GetAllFavorRecords(map[string]interface{}{"article__manager__id": ManagerInfo.Id})
+	records, _ := models.GetAllFavorRecords(filter)
 	c.Data["records"] = records
 }

@@ -8,7 +8,7 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-var appURL = beego.AppConfig.String("appurl")                                            // 博客首页地址
+var appURL = beego.AppConfig.String("app_url")                                           // 博客后台地址
 var emailFooter = "登录地址：<a href=\"" + appURL + "\" target=\"_blank\">" + appURL + "</a>" // 邮件页脚
 
 // SendNewManagerEmail 给新创建的用户发送邮件
