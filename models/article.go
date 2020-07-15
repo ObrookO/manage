@@ -16,10 +16,16 @@ func AddArticle(article Article) (int64, error) {
 func GetAllArticles(filter map[string]interface{}) ([]*Article, error) {
 	var articles []*Article
 
-	_, err := concatFilter("article", filter).OrderBy("-id").RelatedSel("category", "manager").All(&articles)
+	_, err := concatFilter("article", filter).
+		RelatedSel().
+		OrderBy("-id").
+		All(&articles)
+
 	// 查询标签
 	for _, a := range articles {
 		o.LoadRelated(a, "Tags")
+		o.LoadRelated(a, "Comments")
+		o.LoadRelated(a, "Favors")
 	}
 
 	return articles, err

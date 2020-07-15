@@ -50,9 +50,7 @@
                             <th>文章标题</th>
                             <th>文章作者</th>
                             <th>原始内容</th>
-                            <th>显示内容</th>
-                            <th>违规内容</th>
-                            <th>IP</th>
+                            <th>客户端IP</th>
                             <th>评论时间</th>
                             <th>操作</th>
                         </tr>
@@ -64,13 +62,7 @@
                                 <td>{{$comment.Account.Username}}</td>
                                 <td>{{$comment.Article.Title}}</td>
                                 <td>{{$comment.Article.Manager.Username}}</td>
-                                <td>{{$comment.OriginalContent}}</td>
-                                <td>
-                                    <label for="" class="label label-info">{{$comment.ShowContent}}</label>
-                                </td>
-                                <td>
-                                    <label for="" class="label label-danger">{{$comment.Keyword}}</label>
-                                </td>
+                                <td style="max-width: 300px; word-break: break-all">{{$comment.OriginalContent}}</td>
                                 <td>{{$comment.Ip}}</td>
                                 <td>{{dateformat $comment.CreatedAt "2006-01-02 15:04:05"}}</td>
                                 <td>

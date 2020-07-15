@@ -12,45 +12,68 @@
             <div class="ibox-content">
                 <div class="row">
                     <div class="col-lg-12 form-horizontal">
-                        <div class="form-group">
-                            <label for="" class="col-lg-1 control-label">所属栏目</label>
-                            <div class="col-lg-3">
-                                <select name="" id="category" class="form-control chosen-select">
-                                    <option value="-1">不限</option>
-                                    {{range $cate := .categories}}
-                                        <option value="{{$cate.Id}}" {{if eq $cate.Id $.c}}selected{{end}}>{{$cate.Name}}</option>
-                                    {{end}}
-                                </select>
-                            </div>
+                        {{if eq .isAdmin 1}}
+                            <div class="form-group">
+                                <label for="" class="col-lg-1 control-label">所属栏目</label>
+                                <div class="col-lg-3">
+                                    <select name="" id="category" class="form-control chosen-select">
+                                        <option value="-1">不限</option>
+                                        {{range $cate := .categories}}
+                                            <option value="{{$cate.Id}}" {{if eq $cate.Id $.c}}selected{{end}}>{{$cate.Name}}</option>
+                                        {{end}}
+                                    </select>
+                                </div>
 
-                            <label for="" class="col-lg-1 control-label">是否轮播</label>
-                            <div class="col-lg-3">
-                                <select name="" id="isScroll" class="form-control">
-                                    <option value="-1">不限</option>
-                                    <option value="0" {{if eq .s 0}}selected{{end}}>不轮播</option>
-                                    <option value="1" {{if eq .s 1}}selected{{end}}>轮播</option>
-                                </select>
+                                <label for="" class="col-lg-1 control-label">是否轮播</label>
+                                <div class="col-lg-3">
+                                    <select name="" id="isScroll" class="form-control">
+                                        <option value="-1">不限</option>
+                                        <option value="0" {{if eq .s 0}}selected{{end}}>不轮播</option>
+                                        <option value="1" {{if eq .s 1}}selected{{end}}>轮播</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="" class="col-lg-1 control-label">评论权限</label>
-                            <div class="col-lg-3">
-                                <select name="" id="allowComment" class="form-control">
-                                    <option value="-1">不限</option>
-                                    <option value="0" {{if eq .ac 0}}selected{{end}}>禁止评论</option>
-                                    <option value="1" {{if eq .ac 1}}selected{{end}}>允许评论</option>
-                                </select>
-                            </div>
+                            <div class="form-group">
+                                <label for="" class="col-lg-1 control-label">评论权限</label>
+                                <div class="col-lg-3">
+                                    <select name="" id="allowComment" class="form-control">
+                                        <option value="-1">不限</option>
+                                        <option value="0" {{if eq .ac 0}}selected{{end}}>禁止评论</option>
+                                        <option value="1" {{if eq .ac 1}}selected{{end}}>允许评论</option>
+                                    </select>
+                                </div>
 
-                            <label for="" class="col-lg-1 control-label">是否推荐</label>
-                            <div class="col-lg-3">
-                                <select name="" id="isRecommend" class="form-control">
-                                    <option value="-1">不限</option>
-                                    <option value="0" {{if eq .r 0}}selected{{end}}>不推荐</option>
-                                    <option value="1" {{if eq .r 1}}selected{{end}}>推荐</option>
-                                </select>
+                                <label for="" class="col-lg-1 control-label">是否推荐</label>
+                                <div class="col-lg-3">
+                                    <select name="" id="isRecommend" class="form-control">
+                                        <option value="-1">不限</option>
+                                        <option value="0" {{if eq .r 0}}selected{{end}}>不推荐</option>
+                                        <option value="1" {{if eq .r 1}}selected{{end}}>推荐</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
+                        {{else}}
+                            <div class="form-group">
+                                <label for="" class="col-lg-1 control-label">所属栏目</label>
+                                <div class="col-lg-3">
+                                    <select name="" id="category" class="form-control chosen-select">
+                                        <option value="-1">不限</option>
+                                        {{range $cate := .categories}}
+                                            <option value="{{$cate.Id}}" {{if eq $cate.Id $.c}}selected{{end}}>{{$cate.Name}}</option>
+                                        {{end}}
+                                    </select>
+                                </div>
+
+                                <label for="" class="col-lg-1 control-label">评论权限</label>
+                                <div class="col-lg-3">
+                                    <select name="" id="allowComment" class="form-control">
+                                        <option value="-1">不限</option>
+                                        <option value="0" {{if eq .ac 0}}selected{{end}}>禁止评论</option>
+                                        <option value="1" {{if eq .ac 1}}selected{{end}}>允许评论</option>
+                                    </select>
+                                </div>
+                            </div>
+                        {{end}}
                         <div class="form-group">
                             <label for="" class="col-lg-1 control-label">状态</label>
                             <div class="col-lg-3">
@@ -83,14 +106,19 @@
                         <tr>
                             <th>#</th>
                             <th>标题</th>
-                            <th>关键词</th>
                             <th>所属栏目</th>
                             <th>标签</th>
                             <th>封面</th>
-                            <th>是否轮播</th>
-                            <th>是否推荐</th>
+                            <th>评论数</th>
+                            <th>点赞数</th>
+                            {{if eq .isAdmin 1}}
+                                <th>是否推荐</th>
+                            {{end}}
                             <th>允许评论</th>
-                            <th>作者</th>
+                            {{if eq .isAdmin 1}}
+                                <th>作者</th>
+                            {{end}}
+                            <th>添加时间</th>
                             <th>更新时间</th>
                             <th>操作</th>
                         </tr>
@@ -100,7 +128,6 @@
                             <tr>
                                 <td>{{$index | add 1}}</td>
                                 <td>{{$article.Title}}</td>
-                                <td>{{$article.Keyword}}</td>
                                 <td>{{$article.Category.Name}}</td>
                                 <td style="max-width: 260px">
                                     {{range $t := $article.Tags}}
@@ -110,20 +137,17 @@
                                 <td>
                                     <a href="{{$article.CoverUrl}}" target="_blank">{{$article.Cover}}</a>
                                 </td>
-                                <td>
-                                    {{if $article.IsScroll}}
-                                        <label for="" class="label label-primary">轮播</label>
-                                    {{else}}
-                                        <label for="" class="label label-danger">不轮播</label>
-                                    {{end}}
-                                </td>
-                                <td>
-                                    {{if $article.IsRecommend}}
-                                        <label for="" class="label label-primary">推荐</label>
-                                    {{else}}
-                                        <label for="" class="label label-danger">不推荐</label>
-                                    {{end}}
-                                </td>
+                                <td>{{len $article.Comments}}</td>
+                                <td>{{len $article.Favors}}</td>
+                                {{if eq $.isAdmin 1}}
+                                    <td>
+                                        {{if $article.IsRecommend}}
+                                            <label for="" class="label label-primary">推荐</label>
+                                        {{else}}
+                                            <label for="" class="label label-danger">不推荐</label>
+                                        {{end}}
+                                    </td>
+                                {{end}}
                                 <td>
                                     {{if $article.AllowComment}}
                                         <label for="" class="label label-primary">允许</label>
@@ -131,7 +155,10 @@
                                         <label for="" class="label label-danger">不允许</label>
                                     {{end}}
                                 </td>
-                                <td>{{$article.Manager.Username}}</td>
+                                {{if eq $.isAdmin 1}}
+                                    <td>{{$article.Manager.Username}}</td>
+                                {{end}}
+                                <td>{{dateformat $article.CreatedAt "2006-01-02 15:04:05"}}</td>
                                 <td>{{dateformat $article.UpdatedAt "2006-01-02 15:04:05"}}</td>
                                 <td>
                                     <a class="btn btn-primary btn-xs btn-outline" href="{{urlfor "ArticleController.Edit" ":id" $article.Id}}">编辑</a>

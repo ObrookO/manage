@@ -36,7 +36,7 @@ func (c *LogController) EmailLog() {
 		filter["address__istartswith"] = keyword
 	}
 
-	emailType := map[int64]string{0: "初始密码邮件", 1: "重置密码邮件"}
+	emailType := map[int64]string{0: "初始密码邮件", 1: "重置管理员密码邮件", 2: "注册账号邮件", 3: "重置账号密码邮件"}
 	logs, _ := models.GetAllEmailLogs(filter)
 
 	c.Data["emailType"] = emailType

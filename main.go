@@ -14,6 +14,7 @@ import (
 
 func init() {
 	gob.Register(&models.Manager{})
+	gob.Register(&models.Account{})
 }
 
 func main() {

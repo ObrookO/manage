@@ -17,7 +17,7 @@
             ordering: false,
             info: false,
             lengthChange: false,
-            pageLength: 20,
+            pageLength: 15,
             language: {
                 emptyTable: '暂无数据'
             }
@@ -35,8 +35,10 @@
             status = $('#status').val(),
             keyword = $('#keyword').val();
 
-        window.location.href = '{{urlfor "ArticleController.Get"}}' + '?c=' + category + '&s=' + isScroll + '&ac=' + allowComment + '&r=' +
-            isRecommend + '&st=' + status + '&k=' + keyword;
+        window.location.href = '{{urlfor "ArticleController.Get"}}' + '?c=' + category + '&s=' + (isScroll == undefined ? -1 : isScroll) + '&ac=' +
+            allowComment +
+            '&r=' +
+            (isRecommend == undefined ? -1 : isRecommend) + '&st=' + status + '&k=' + keyword;
     }
 
     /**

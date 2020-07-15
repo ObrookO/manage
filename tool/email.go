@@ -11,7 +11,7 @@ import (
 var appURL = beego.AppConfig.String("app_url")                                           // 博客后台地址
 var emailFooter = "登录地址：<a href=\"" + appURL + "\" target=\"_blank\">" + appURL + "</a>" // 邮件页脚
 
-// SendNewManagerEmail 给新创建的用户发送邮件
+// SendNewManagerEmail 给新创建的管理员发送邮件
 func SendNewManagerEmail(toAddress, account, rawPassword string) {
 	subject := "账号创建成功通知"
 	contentType := "text/html"
@@ -24,8 +24,8 @@ func SendNewManagerEmail(toAddress, account, rawPassword string) {
 	sendEmail(models.NewManager, toAddress, subject, contentType, strings.Join(content, "<br>"))
 }
 
-// SendResetPasswordEmail 发送重置密码的邮件
-func SendResetPasswordEmail(toAddress, code string) {
+// SendManagerResetPasswordEmail 发送管理员重置密码的邮件
+func SendManagerResetPasswordEmail(toAddress, code string) {
 	subject := "验证码"
 	contentType := "text/html"
 	content := []string{
@@ -34,7 +34,7 @@ func SendResetPasswordEmail(toAddress, code string) {
 		strings.Repeat("<br>", 2) + emailFooter,
 	}
 
-	sendEmail(models.ResetPassword, toAddress, subject, contentType, strings.Join(content, "<br>"))
+	sendEmail(models.ResetManagerPassword, toAddress, subject, contentType, strings.Join(content, "<br>"))
 }
 
 // sendEmail 发送邮件

@@ -10,10 +10,9 @@
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>账号</th>
                             <th>文章标题</th>
                             <th>作者</th>
-                            <th>IP</th>
+                            <th>客户端IP</th>
                             <th>点赞时间</th>
                         </tr>
                         </thead>
@@ -21,7 +20,6 @@
                         {{range $index, $record := .records}}
                         <tr>
                             <td>{{$index | add 1}}</td>
-                            <td>{{$record.Account.Username}}</td>
                             <td>{{$record.Article.Title}}</td>
                             <td>{{$record.Article.Manager.Username}}</td>
                             <td>{{$record.Ip}}</td>

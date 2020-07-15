@@ -1,8 +1,10 @@
 package models
 
 const (
-	NewManager    = iota // 添加用户
-	ResetPassword        // 重置密码
+	NewManager           = iota // 添加管理员
+	ResetManagerPassword        // 重置密码
+	RegisterAccount             // 前台用户注册
+	ResetAccountPassword        // 前台用户重置密码
 )
 
 // AddEmailLog 添加发送邮件日志

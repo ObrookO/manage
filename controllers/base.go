@@ -29,12 +29,22 @@ type JSONResponse struct {
 
 var (
 	ManagerInfo *models.Manager // 管理员信息
+
+	rc cache.Cache // 缓存实例
 )
 
 func (c *BaseController) Prepare() {
+	if r, err := getRedisCache(); err != nil {
+		logs.Error("实例化redis缓存失败：%v", err)
+		rc = cache.NewMemoryCache()
+	} else {
+		rc = r
+	}
+
 	if !c.IsAjax() {
 		c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())                    // 定义全局xsrf
 		c.Data["appTitle"] = beego.AppConfig.DefaultString("apptitle", "勤劳的码农") // 定义app title
+		c.Data["appURL"] = beego.AppConfig.String("app_url")                    // 定义app url
 	} else {
 		c.EnableRender = false // ajax请求不加载模板
 	}
@@ -80,15 +90,12 @@ func (c *BaseController) Prepare() {
 	}
 }
 
-// GetRedisCache 获取redis缓存实例
-func GetRedisCache() (cache.Cache, error) {
+// getRedisCache 获取redis缓存实例
+func getRedisCache() (cache.Cache, error) {
+	appName := beego.AppConfig.String("appname")
 	address := beego.AppConfig.String("redis_host")
-	c, err := cache.NewCache("redis", `{"key":"mn","conn":"`+address+`"}`)
-	if err != nil {
-		logs.Error("init redis cache failed, error: %v", err)
-	}
 
-	return c, err
+	return cache.NewCache("redis", `{"key":"`+appName+`","conn":"`+address+`"}`)
 }
 
 // 记录日志

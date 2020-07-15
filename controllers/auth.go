@@ -91,6 +91,7 @@ func (c *AuthController) DoLogin() {
 		return
 	}
 
+	ManagerInfo = &manager
 	c.SetSession("isLogin", true)
 	c.SetSession("manager", &manager)
 
@@ -126,17 +127,11 @@ func (c *AuthController) SendResetPasswordEmail() {
 	}
 
 	// 生成验证码
-	rc, err := GetRedisCache()
-	if err != nil {
-		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "系统错误，请联系管理员"}
-		c.ServeJSON()
-		return
-	}
-
 	code := utils.RandomStr(8)
 	rc.Put(username+CodeSuffix, code, CodeDuration)
 
-	go tool.SendResetPasswordEmail(manager.Email, code)
+	go tool.SendManagerResetPasswordEmail(manager.Email, code)
+
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
 	c.ServeJSON()
 }
@@ -154,18 +149,10 @@ func (c *AuthController) ResetPassword() {
 		return
 	}
 
-	rc, err := GetRedisCache()
-	if err != nil {
-		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400001, \"msg\": \"系统错误\"}")
-		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "系统错误"}
-		c.ServeJSON()
-		return
-	}
-
 	code := c.GetString("code")
 	if code != fmt.Sprintf("%s", rc.Get(username+CodeSuffix)) {
-		AddLog(c.Ctx, logContent, "邮箱验证码错误", "{\"code\": 400002, \"msg\": \"邮箱验证码错误\"}")
-		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "邮箱验证码错误"}
+		AddLog(c.Ctx, logContent, "邮箱验证码错误", "{\"code\": 400001, \"msg\": \"邮箱验证码错误\"}")
+		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "邮箱验证码错误"}
 		c.ServeJSON()
 		return
 	}
@@ -175,8 +162,8 @@ func (c *AuthController) ResetPassword() {
 	reg, _ := regexp.Compile(pattern)
 	password := c.GetString("password")
 	if !reg.MatchString(password) {
-		AddLog(c.Ctx, logContent, "密码由8-16位的大小写字母和数字组成", "{\"code\": 400003, \"msg\": \"密码由8-16位的大小写字母和数字组成\"}")
-		c.Data["json"] = &JSONResponse{Code: 400003, Msg: "密码由8-16位的大小写字母和数字组成"}
+		AddLog(c.Ctx, logContent, "密码由8-16位的大小写字母和数字组成", "{\"code\": 400002, \"msg\": \"密码由8-16位的大小写字母和数字组成\"}")
+		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "密码由8-16位的大小写字母和数字组成"}
 		c.ServeJSON()
 		return
 	}
@@ -186,8 +173,8 @@ func (c *AuthController) ResetPassword() {
 		"password":   encrypted,
 		"updated_at": time.Now().Format("2006-01-02 15:04:05"),
 	}); err != nil {
-		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400004, \"msg\": \"操作失败\"}")
-		c.Data["json"] = &JSONResponse{Code: 400004, Msg: "操作失败"}
+		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400003, \"msg\": \"操作失败\"}")
+		c.Data["json"] = &JSONResponse{Code: 400003, Msg: "操作失败"}
 		c.ServeJSON()
 		return
 	}

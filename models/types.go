@@ -44,23 +44,24 @@ type AdminLog struct {
 
 // Article 文章
 type Article struct {
-	Id           int       `form:"id"`
-	Title        string    `form:"title" valid:"Required"`   // 标题
-	Keyword      string    `form:"keyword" valid:"Required"` // 关键词
-	Category     *Category `form:"categoryId" valid:"Required" orm:"rel(one)"`
-	Tags         []*Tag    `form:"tags" valid:"Required" orm:"rel(m2m);rel_through(manage/models.ArticleTag)"` // 标签
-	Description  string    `form:"description" valid:"Required"`                                               // 描述
-	Cover        string    `form:"cover" valid:"Required"`                                                     // 封面地址
-	CoverUrl     string    // 封面地址
-	Content      string    `form:"content" valid:"Required"`        // 内容
-	IsScroll     int8      `form:"isScroll" valid:"Match(0|1)"`     // 是否轮播
-	IsRecommend  int8      `form:"isRecommend" valid:"Match(0|1)"`  // 是否推荐
-	AllowComment int8      `form:"allowComment" valid:"Match(0|1)"` // 是否允许评论
-	//FavorRecord  []*FavorRecord `orm:"rel(m2m)"`                                                                    // 点赞数量
-	Manager   *Manager  `orm:"rel(one)"` // 管理员信息，即作者信息
-	Status    int8      // 状态
-	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)"` // 添加时间
-	UpdatedAt time.Time `orm:"auto_now;type(timestamp)"`     // 修改时间
+	Id           int            `form:"id"`
+	Title        string         `form:"title" valid:"Required"`   // 标题
+	Keyword      string         `form:"keyword" valid:"Required"` // 关键词
+	Category     *Category      `form:"categoryId" valid:"Required" orm:"rel(one)"`
+	Tags         []*Tag         `form:"tags" valid:"Required" orm:"rel(m2m);rel_through(manage/models.ArticleTag)"` // 标签
+	Description  string         `form:"description" valid:"Required"`                                               // 描述
+	Cover        string         `form:"cover" valid:"Required"`                                                     // 封面地址
+	CoverUrl     string         // 封面地址
+	Content      string         `form:"content" valid:"Required"`        // 内容
+	IsScroll     int8           `form:"isScroll" valid:"Match(0|1)"`     // 是否轮播
+	IsRecommend  int8           `form:"isRecommend" valid:"Match(0|1)"`  // 是否推荐
+	AllowComment int8           `form:"allowComment" valid:"Match(0|1)"` // 是否允许评论
+	Comments     []*Comment     `orm:"reverse(many)"`                    // 评论列表
+	Favors       []*FavorRecord `orm:"reverse(many)"`                    // 点赞记录
+	Manager      *Manager       `orm:"rel(one)"`                         // 管理员信息，即作者信息
+	Status       int8           // 状态
+	CreatedAt    time.Time      `orm:"auto_now_add;type(timestamp)"` // 添加时间
+	UpdatedAt    time.Time      `orm:"auto_now;type(timestamp)"`     // 修改时间
 }
 
 // ArticleTag 文章标签
@@ -82,7 +83,7 @@ type Category struct {
 type Comment struct {
 	Id              int
 	Account         *Account `orm:"rel(one)"`
-	Article         *Article `orm:"rel(one)"`
+	Article         *Article `orm:"rel(fk)"`
 	OriginalContent string
 	ShowContent     string
 	Keyword         string // 违规关键词
@@ -93,8 +94,7 @@ type Comment struct {
 // FavorRecord 点赞记录
 type FavorRecord struct {
 	Id        int
-	Account   *Account `orm:"rel(one)"`
-	Article   *Article `orm:"rel(one)"`
+	Article   *Article `orm:"rel(fk)"`
 	Ip        string
 	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)"`
 }
@@ -137,6 +137,7 @@ type Tag struct {
 	UpdatedAt time.Time `orm:"auto_now;type(timestamp)"`
 }
 
+// EmailLog 邮件日志
 type EmailLog struct {
 	Id        int
 	EmailType int

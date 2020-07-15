@@ -19,8 +19,10 @@ func (c *CommentController) Get() {
 	AddLog(c.Ctx, "查看评论列表", "", "PAGE")
 
 	filter := map[string]interface{}{}
+	articleFilter := map[string]interface{}{"status": 1}
 	if ManagerInfo.IsAdmin != 1 {
 		filter["article__manager__id"] = ManagerInfo.Id
+		articleFilter["manager_id"] = ManagerInfo.Id
 	}
 
 	// 根据文章id查询
@@ -34,7 +36,7 @@ func (c *CommentController) Get() {
 		filter["account_id"] = accountId
 	}
 
-	articles, _ := models.GetAllArticles(map[string]interface{}{"status": 1})
+	articles, _ := models.GetAllArticles(articleFilter)
 	accounts, _ := models.GetAllAccounts(nil)
 	comments, _ := models.GetAllComments(filter)
 

@@ -4,6 +4,6 @@ package models
 func GetAllFavorRecords(filter map[string]interface{}) ([]*FavorRecord, error) {
 	var records []*FavorRecord
 
-	_, err := concatFilter("favor_record", filter).RelatedSel().All(&records)
+	_, err := concatFilter("favor_record", filter).RelatedSel().OrderBy("-id").All(&records)
 	return records, err
 }

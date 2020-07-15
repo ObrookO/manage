@@ -43,13 +43,13 @@
                 </a>
             </li>
             <li>
-                <a href="{{urlfor "FavorRecordController.Get"}}">
-                    <i class="fa fa-thumbs-up"></i> <span class="nav-label">点赞记录</span>
+                <a href="{{urlfor "CommentController.Get"}}">
+                    <i class="fa fa-comments"></i> <span class="nav-label">评论管理</span>
                 </a>
             </li>
             <li>
-                <a href="{{urlfor "CommentController.Get"}}">
-                    <i class="fa fa-comments"></i> <span class="nav-label">评论管理</span>
+                <a href="{{urlfor "FavorRecordController.Get"}}">
+                    <i class="fa fa-thumbs-up"></i> <span class="nav-label">点赞记录</span>
                 </a>
             </li>
             {{if eq .isAdmin 1}}
