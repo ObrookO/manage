@@ -19,6 +19,9 @@ func validData(data interface{}) error {
 	case "models.Article":
 		b, err = v.Valid(data.(models.Article))
 
+	case "models.Resource":
+		b, err = v.Valid(data.(models.Resource))
+
 	case "models.Manager":
 		b, err = v.Valid(data.(models.Manager))
 

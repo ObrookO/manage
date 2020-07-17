@@ -47,6 +47,11 @@ func init() {
 		beego.NSRouter("/", &controllers.CommentController{}, "get:Get"),
 		beego.NSRouter("/delete", &controllers.CommentController{}, "post:Delete"),
 	)
+	// 干货管理
+	rn := beego.NewNamespace("/resource",
+		beego.NSRouter("/", &controllers.ResourceController{}, "get:Get;post:Post"),
+		beego.NSRouter("/delete", &controllers.ResourceController{}, "post:DeleteResource"),
+	)
 	// 日志管理
 	lns := beego.NewNamespace("/logs",
 		beego.NSRouter("/email", &controllers.LogController{}, "get:EmailLog"),
@@ -69,5 +74,5 @@ func init() {
 		beego.NSRouter("/reset/sendEmail", &controllers.AuthController{}, "post:SendResetPasswordEmail"),
 	)
 
-	beego.AddNamespace(uns, cns, tns, ans, fns, cns2, lns, sns, ans2)
+	beego.AddNamespace(uns, cns, tns, ans, fns, cns2, lns, sns, ans2, rn)
 }

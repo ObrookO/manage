@@ -1,24 +1,109 @@
-<div class="col-lg-12">
-    <div class="ibox float-e-margins">
-        <div class="ibox-title">
-            <h3>注意事项</h3>
+<div class="row">
+    <div class="col-lg-4">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <span class="label label-primary">今日发布文章</span>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins">{{.tAmount}}</h1>
+            </div>
         </div>
-        <div class="ibox-content">
-            <div class="alert alert-danger">
-                1、账号开通成功后，建议把密码修改为<strong>强度足够的自定义密码（降低泄漏的风险）</strong>。修改密码地址为：
-                <a href="{{.appURL}}auth/reset" target="_blank">{{.appURL}}auth/reset</a>。
+    </div>
+    <div class="col-lg-4">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <span class="label label-success">本月发布文章</span>
             </div>
-            <div class="alert alert-info">
-                2、建立此网站的初衷为分享<strong>互联网技术</strong>、<strong>个人经验</strong>、<strong>干货</strong>以及<strong>学习资源</strong>等，<strong>请勿发表与以上信息无关的内容</strong>。
+            <div class="ibox-content">
+                <h1 class="no-margins">{{.mAmount}}</h1>
             </div>
-            <div class="alert alert-success">
-                3、由于个人水平有限，如果使用过程中出现一些问题或BUG，或者有些好的想法和建议，欢迎issue。项目地址：<a href="https://github.com/ObrookO/manage" target="_blank">https://github
-                    .com/ObrookO/manage</a>。
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <span class="label label-danger">文章总数</span>
             </div>
-            <div class="alert alert-warning">
-                4、此网站的基础功能已开发完毕，后续会持续进行优化。如果感觉还不错，欢迎star。项目地址：<a href="https://github.com/ObrookO/manage"
-                                                                                target="_blank">https://github
-                    .com/ObrookO/manage</a>。
+            <div class="ibox-content">
+                <h1 class="no-margins">{{.aAmount}}</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{if eq .isAdmin 1}}
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-primary">今日新增账号</span>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">{{.t2Amount}}</h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-success">本月新增账号</span>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">{{.m2Amount}}</h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-info">可用账号</span>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">{{.a2Amount}}</h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-danger">不可用账号</span>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">{{.da2Amount}}</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+{{end}}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>注意事项</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <div class="alert alert-danger">
+                    1、账号开通成功后，建议把密码修改为<strong>强度足够的自定义密码（降低泄漏的风险）</strong>。修改密码地址为：
+                    <a href="{{.appURL}}auth/reset" target="_blank">{{.appURL}}auth/reset</a>。
+                </div>
+                <div class="alert alert-info">
+                    2、建立此网站的初衷为分享<strong>互联网技术</strong>、<strong>个人经验</strong>、<strong>干货</strong>以及<strong>学习资源</strong>等，<strong>请勿发表与以上信息无关的内容</strong>。
+                </div>
+                <div class="alert alert-success">
+                    3、由于个人水平有限，如果使用过程中出现一些问题或BUG，或者有些好的想法和建议，欢迎issue。项目地址：<a href="https://github.com/ObrookO/manage" target="_blank">https://github
+                        .com/ObrookO/manage</a>。
+                </div>
+                <div class="alert alert-warning">
+                    4、此网站的基础功能已开发完毕，后续会持续进行优化。如果感觉还不错，欢迎star。项目地址：<a href="https://github.com/ObrookO/manage"
+                                                                     target="_blank">https://github
+                        .com/ObrookO/manage</a>。
+                </div>
             </div>
         </div>
     </div>

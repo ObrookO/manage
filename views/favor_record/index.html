@@ -5,26 +5,55 @@
                 <h5>点赞记录</h5>
             </div>
             <div class="ibox-content">
+                <div class="row">
+                    <div class="col-lg-12 form-horizontal">
+                        <div class="form-group">
+                            <label for="" class="col-lg-1 control-label">所属文章</label>
+                            <div class="col-lg-4">
+                                <select class="chosen-select" name="" id="article">
+                                    <option value="-1">不限</option>
+                                    {{range $article := .articles}}
+                                        <option value="{{$article.Id}}" {{if eq $article.Id $.ar}} selected {{end}}>
+                                            {{$article.Title}} {{if eq $.isAdmin 1}} - {{$article.Manager.Username}} {{end}}
+                                        </option>
+                                    {{end}}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="col-lg-1 control-label"></label>
+                            <div class="col-lg-4">
+                                <button class="btn btn-primary btn-sm" onclick="searchRecord()">查询</button>
+                                <a class="btn btn-default btn-sm" href="{{urlfor "FavorRecordController.Get"}}">重置</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
                 <div class="table-responsive">
                     <table class="table table-hover record-table">
                         <thead>
                         <tr>
                             <th>#</th>
                             <th>文章标题</th>
-                            <th>作者</th>
+                            {{if eq .isAdmin 1}}
+                                <th>作者</th>
+                            {{end}}
                             <th>客户端IP</th>
                             <th>点赞时间</th>
                         </tr>
                         </thead>
                         <tbody>
                         {{range $index, $record := .records}}
-                        <tr>
-                            <td>{{$index | add 1}}</td>
-                            <td>{{$record.Article.Title}}</td>
-                            <td>{{$record.Article.Manager.Username}}</td>
-                            <td>{{$record.Ip}}</td>
-                            <td>{{dateformat $record.CreatedAt "2006-01-02 15:04:05"}}</td>
-                        </tr>
+                            <tr>
+                                <td>{{$index | add 1}}</td>
+                                <td>{{$record.Article.Title}}</td>
+                                {{if eq $.isAdmin 1}}
+                                    <td>{{$record.Article.Manager.Username}}</td>
+                                {{end}}
+                                <td>{{$record.Ip}}</td>
+                                <td>{{dateformat $record.CreatedAt "2006-01-02 15:04:05"}}</td>
+                            </tr>
                         {{end}}
                         </tbody>
                     </table>

@@ -91,6 +91,18 @@ type Comment struct {
 	CreatedAt       time.Time `orm:"auto_now_add;type(timestamp)"`
 }
 
+// EmailLog 邮件日志
+type EmailLog struct {
+	Id        int
+	EmailType int
+	Address   string
+	Content   string
+	Result    string
+	Reason    string
+	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)"`
+	UpdatedAt time.Time `orm:"auto_now;type(timestamp)"`
+}
+
 // FavorRecord 点赞记录
 type FavorRecord struct {
 	Id        int
@@ -129,22 +141,20 @@ type Manager struct {
 	UpdatedAt time.Time `orm:"auto_now;type(timestamp)" json:"-"`
 }
 
+// Resource 干货收藏
+type Resource struct {
+	Id          int
+	Title       string    `form:"title" valid:"Required"`
+	Description string    `form:"description" valid:"Required"`
+	Url         string    `form:"url" valid:"Required"`
+	CreatedAt   time.Time `orm:"auto_now_add;type(timestamp)" json:"-"`
+	UpdatedAt   time.Time `orm:"auto_now;type(timestamp)" json:"-"`
+}
+
 // Tag 标签
 type Tag struct {
 	Id        int
 	Name      string
-	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)"`
-	UpdatedAt time.Time `orm:"auto_now;type(timestamp)"`
-}
-
-// EmailLog 邮件日志
-type EmailLog struct {
-	Id        int
-	EmailType int
-	Address   string
-	Content   string
-	Result    string
-	Reason    string
 	CreatedAt time.Time `orm:"auto_now_add;type(timestamp)"`
 	UpdatedAt time.Time `orm:"auto_now;type(timestamp)"`
 }
@@ -166,17 +176,18 @@ func init() {
 	orm.RegisterDataBase("default", "mysql", user+":"+pass+"@tcp("+host+")/"+db+"?charset=utf8&loc=Asia%2FShanghai")
 	// 注册模型
 	orm.RegisterModel(
-		new(Manager),
 		new(Account),
 		new(AdminLog),
 		new(Article),
 		new(ArticleTag),
 		new(Category),
 		new(Comment),
+		new(EmailLog),
 		new(FavorRecord),
 		new(HomeLog),
+		new(Manager),
+		new(Resource),
 		new(Tag),
-		new(EmailLog),
 	)
 
 	o = orm.NewOrm()

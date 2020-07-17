@@ -5,6 +5,11 @@ func IsArticleExists(filter map[string]interface{}) bool {
 	return concatFilter("article", filter).Exist()
 }
 
+// GetArticleAmount 获取文章数量
+func GetArticleAmount(filter map[string]interface{}) (int64, error) {
+	return concatFilter("article", filter).Count()
+}
+
 // AddArticle 添加文章
 func AddArticle(article Article) (int64, error) {
 	o.Insert(&article)
@@ -44,29 +49,6 @@ func GetOneArticle(filter map[string]interface{}) (Article, error) {
 	err := concatFilter("article", filter).RelatedSel().One(&article)
 	o.LoadRelated(&article, "Tags")
 	return article, err
-}
-
-// GetBeforeAndAfter 获取上一篇文章的id以及下一篇文章的id
-func GetBeforeAndAfter(aid int) (int, int) {
-	var article Article
-	var before, after int
-
-	needle := o.QueryTable("article")
-	// 获取上一篇文章的id
-	if err := needle.Filter("id__lt", aid).OrderBy("-id").One(&article, "id"); err == nil {
-		before = article.Id
-	} else {
-		before = 0
-	}
-
-	// 获取下一篇文章的id
-	if err := needle.Filter("id__gt", aid).OrderBy("id").One(&article, "id"); err == nil {
-		after = article.Id
-	} else {
-		after = 0
-	}
-
-	return before, after
 }
 
 // UpdateArticle 更新文章

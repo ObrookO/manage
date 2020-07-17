@@ -23,6 +23,10 @@
             content: '* ';
             color: red;
         }
+
+        textarea {
+            resize: none;
+        }
     </style>
 </head>
 
@@ -94,10 +98,7 @@
                 window.location.reload();
             });
         } else {
-            swal({
-                title: data.msg,
-                icon: 'danger'
-            })
+            showErrorMsg(data.msg);
         }
     }
 
@@ -108,7 +109,7 @@
     function showErrorMsg(msg) {
         swal({
             title: msg,
-            icon: 'danger'
+            icon: 'error'
         })
     }
 </script>

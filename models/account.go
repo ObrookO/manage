@@ -1,5 +1,10 @@
 package models
 
+// GetAccountAmount 获取账号数量
+func GetAccountAmount(filter map[string]interface{}) (int64, error) {
+	return concatFilter("account", filter).Count()
+}
+
 // AddAccount 添加账号
 func AddAccount(data *Account) (int64, error) {
 	return o.Insert(data)

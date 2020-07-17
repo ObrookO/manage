@@ -20,7 +20,7 @@ func (c *AccountController) Get() {
 		"Script": "account/index_script.html",
 	}
 
-	AddLog(c.Ctx, "查看账号列表", "", "PAGE")
+	addLog(c.Ctx, "查看账号列表", "", "PAGE")
 
 	filter := map[string]interface{}{}
 	// 根据评论权限查询
@@ -60,7 +60,7 @@ func (c *AccountController) ChangeCommentStatus() {
 
 	// 判断status是否合法
 	if !utils.ObjInIntSlice(status, []int{0, 1}) {
-		AddLog(c.Ctx, "修改账号评论权限", "无效的status", "{\"code\": 400000, \"msg\": \"参数错误\"}")
+		addLog(c.Ctx, "修改账号评论权限", "无效的status", "{\"code\": 400000, \"msg\": \"参数错误\"}")
 		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "参数错误"}
 		c.ServeJSON()
 		return
@@ -69,7 +69,7 @@ func (c *AccountController) ChangeCommentStatus() {
 	// 判断账号是否存在
 	account, _ := models.GetOneAccount(map[string]interface{}{"id": accountId})
 	if account.Id == 0 {
-		AddLog(c.Ctx, "修改账号评论权限", "账号不存在", "{\"code\": 400001, \"msg\": \"账号不存在\"}")
+		addLog(c.Ctx, "修改账号评论权限", "账号不存在", "{\"code\": 400001, \"msg\": \"账号不存在\"}")
 		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "账号不存在"}
 		c.ServeJSON()
 		return
@@ -82,13 +82,13 @@ func (c *AccountController) ChangeCommentStatus() {
 		"allow_comment": status,
 		"updated_at":    time.Now().Format("2006-01-02 15:04:05"),
 	}); err != nil {
-		AddLog(c.Ctx, logContent, err.Error(), "{\"code\": 400002, \"msg\": \"操作失败\"}")
+		addLog(c.Ctx, logContent, err.Error(), "{\"code\": 400002, \"msg\": \"操作失败\"}")
 		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "操作失败"}
 		c.ServeJSON()
 		return
 	}
 
-	AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}")
+	addLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}")
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
 	c.ServeJSON()
 }
@@ -101,7 +101,7 @@ func (c *AccountController) ChangeStatus() {
 
 	// 判断status是否合法
 	if !utils.ObjInIntSlice(status, []int{0, 1}) {
-		AddLog(c.Ctx, "修改账号状态", "无效的status", "{\"code\": 400000, \"msg\": \"参数错误\"}")
+		addLog(c.Ctx, "修改账号状态", "无效的status", "{\"code\": 400000, \"msg\": \"参数错误\"}")
 		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "参数错误"}
 		c.ServeJSON()
 		return
@@ -109,7 +109,7 @@ func (c *AccountController) ChangeStatus() {
 	// 判断账号是否存在
 	account, _ := models.GetOneAccount(map[string]interface{}{"id": accountId})
 	if account.Id == 0 {
-		AddLog(c.Ctx, "修改账号状态", "账号不存在", "{\"code\": 400001, \"msg\": \"账号不存在\"}")
+		addLog(c.Ctx, "修改账号状态", "账号不存在", "{\"code\": 400001, \"msg\": \"账号不存在\"}")
 		c.Data["json"] = &JSONResponse{Code: 400001, Msg: "账号不存在"}
 		c.ServeJSON()
 		return
@@ -122,13 +122,13 @@ func (c *AccountController) ChangeStatus() {
 		"status":     status,
 		"updated_at": time.Now().Format("2006-01-02 15:04:05"),
 	}); err != nil {
-		AddLog(c.Ctx, logContent, "", "{\"code\": 400002, \"msg\": \"操作失败\"}")
+		addLog(c.Ctx, logContent, "", "{\"code\": 400002, \"msg\": \"操作失败\"}")
 		c.Data["json"] = &JSONResponse{Code: 400002, Msg: "操作失败"}
 		c.ServeJSON()
 		return
 	}
 
-	AddLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}")
+	addLog(c.Ctx, logContent, "", "{\"code\": 200, \"msg\": \"OK\"}")
 	c.Data["json"] = &JSONResponse{Code: 200, Msg: "OK"}
 	c.ServeJSON()
 }

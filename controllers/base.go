@@ -75,7 +75,8 @@ func (c *BaseController) Prepare() {
 
 			// 判断权限
 			if ManagerInfo.IsAdmin != 1 {
-				if strings.Contains(path, "logs") || strings.Contains(path, "accounts") || strings.Contains(path, "managers") {
+				if strings.Contains(path, "logs") || strings.Contains(path, "accounts") || strings.Contains(path,
+					"resource") || strings.Contains(path, "managers") {
 					if c.IsAjax() {
 						c.Data["json"] = &JSONResponse{Code: 500, Msg: "非法访问"}
 						c.ServeJSON()
@@ -98,8 +99,8 @@ func getRedisCache() (cache.Cache, error) {
 	return cache.NewCache("redis", `{"key":"`+appName+`","conn":"`+address+`"}`)
 }
 
-// 记录日志
-func AddLog(ctx *context.Context, content, reason, response string) {
+// addLog 添加日志
+func addLog(ctx *context.Context, content, reason, response string) {
 	// 请求头转json
 	h, _ := json.Marshal(ctx.Request.Header)
 

@@ -1,10 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<script>
+    /**
+     * 添加干货收藏
+     * @param obj
+     */
+    function addResource(obj) {
+        let modal = $(obj).parents('.modal'),
+            title = $.trim(modal.find('#title').val()),
+            url = $.trim(modal.find('#url').val()),
+            description = $.trim(modal.find('#description').val());
+
+        $.ajax({
+            url: '{{urlfor "ResourceController.Post"}}',
+            type: 'post',
+            dataType: 'json',
+            data: {
+                _xsrf: GToken,
+                title: title,
+                url: url,
+                description: description
+            },
+            beforeSend: function () {
+                if (title.length === 0) {
+                    modal.find('.error').text('请填写标题');
+                    return false;
+                }
+                if (url.length === 0) {
+                    modal.find('.error').text('请填写URL');
+                    return false;
+                }
+                if (description.length === 0) {
+                    modal.find('.error').text('请填写简介');
+                    return false;
+                }
+            },
+            success: function (data) {
+                if (data.code === 200) {
+                    window.location.reload();
+                } else {
+                    modal.find('.error').text(data.msg);
+                }
+            }
+        })
+    }
+
+    /**
+     * 删除干货收藏
+     * @param id
+     */
+    function deleteResource(id) {
+        swal({
+            title: '确定要删除吗？',
+            buttons: ['取消', '确定'],
+            icon: 'warning'
+        }).then(function (opt) {
+            if (opt) {
+                $.post('{{urlfor "ResourceController.DeleteResource"}}', {
+                    _xsrf: GToken,
+                    id: id
+                }, function (data) {
+                    ajaxRequestSuccess(data);
+                }, 'json')
+            }
+        });
+    }
+</script>
