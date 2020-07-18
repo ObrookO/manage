@@ -75,8 +75,7 @@ func (c *BaseController) Prepare() {
 
 			// 判断权限
 			if ManagerInfo.IsAdmin != 1 {
-				if strings.Contains(path, "logs") || strings.Contains(path, "accounts") || strings.Contains(path,
-					"resource") || strings.Contains(path, "managers") {
+				if strings.Contains(path, "logs") || strings.Contains(path, "accounts") || strings.Contains(path, "managers") {
 					if c.IsAjax() {
 						c.Data["json"] = &JSONResponse{Code: 500, Msg: "非法访问"}
 						c.ServeJSON()

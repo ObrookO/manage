@@ -94,18 +94,18 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="" class="col-lg-2 control-label require_label">是否推荐</label>
-                            <div class="col-lg-8">
-                                <label for="" class="radio-inline">
-                                    <input type="radio" value="0" name="is_recommend" {{if eq .article.IsRecommend 0}} checked {{end}}> 不推荐
-                                </label>
-                                <label for="" class="radio-inline">
-                                    <input type="radio" value="1" name="is_recommend" {{if eq .article.IsRecommend 1}} checked {{end}}> 推荐
-                                </label>
-                            </div>
-                        </div>
                     {{end}}
+                    <div class="form-group">
+                        <label for="" class="col-lg-2 control-label require_label">是否推荐</label>
+                        <div class="col-lg-8">
+                            <label for="" class="radio-inline">
+                                <input type="radio" value="0" name="is_recommend" {{if eq .article.IsRecommend 0}} checked {{end}}> 不推荐
+                            </label>
+                            <label for="" class="radio-inline">
+                                <input type="radio" value="1" name="is_recommend" {{if eq .article.IsRecommend 1}} checked {{end}}> 推荐
+                            </label>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label for="" class="col-lg-2 control-label require_label">允许评论</label>
                         <div class="col-lg-8">

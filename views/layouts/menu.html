@@ -52,12 +52,12 @@
                     <i class="fa fa-thumbs-up"></i> <span class="nav-label">点赞记录</span>
                 </a>
             </li>
+            <li>
+                <a href="{{urlfor "ResourceController.Get"}}">
+                    <i class="fa fa-cloud-download"></i> <span class="nav-label">干货管理</span>
+                </a>
+            </li>
             {{if eq .isAdmin 1}}
-                <li>
-                    <a href="{{urlfor "ResourceController.Get"}}">
-                        <i class="fa fa-cloud-download"></i> <span class="nav-label">干货管理</span>
-                    </a>
-                </li>
                 <li>
                     <a href="{{urlfor "ManagerController.Get"}}">
                         <i class="fa fa-users"></i> <span class="nav-label">用户管理</span>
