@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"manage/models"
 	"time"
 )
@@ -9,7 +10,7 @@ type TagController struct {
 	BaseController
 }
 
-var tagNameMaxLength = 10
+var tagNameMaxLength = 30
 
 // Get 查看标签列表
 func (c *TagController) Get() {
@@ -33,8 +34,8 @@ func (c *TagController) Post() {
 	logContent := "添加标签 " + name
 
 	if len(name) == 0 || len([]rune(name)) > tagNameMaxLength {
-		addLog(c.Ctx, logContent, "名称的长度为0-10", "{\"code\": 400000, \"msg\": \"名称的长度为0-10\"}")
-		c.Data["json"] = &JSONResponse{Code: 400000, Msg: "名称的长度为0-10"}
+		addLog(c.Ctx, logContent, fmt.Sprintf("名称的长度为0-%v", tagNameMaxLength), fmt.Sprintf("{\"code\": 400000, \"msg\": \"名称的长度为0-%v\"}", tagNameMaxLength))
+		c.Data["json"] = &JSONResponse{Code: 400000, Msg: fmt.Sprintf("名称的长度为0-%v", tagNameMaxLength)}
 		c.ServeJSON()
 		return
 	}

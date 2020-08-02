@@ -10,7 +10,7 @@ type CategoryController struct {
 	BaseController
 }
 
-var categoryNameMaxLength = 10
+var categoryNameMaxLength = 20
 
 func (c *CategoryController) Get() {
 	c.Layout = "layouts/master.html"
