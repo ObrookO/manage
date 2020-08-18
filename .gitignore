@@ -2,6 +2,7 @@
 .idea/
 *.conf
 manage
+manage.exe
 manage.tar.gz
 go.sum
 *.log
